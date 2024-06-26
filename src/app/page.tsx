@@ -1,6 +1,9 @@
+import Board from "@/app/components/board/board";
 
 export default function MainPages() {
   return (
-      <main>Initial Home Page</main>
+      <main>
+        <Board/>
+      </main>
   );
 }
