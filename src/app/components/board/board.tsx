@@ -1,6 +1,7 @@
 import Client from "@/app/components/client/client";
 import Worker from "@/app/components/worker/worker";
 import Board_Cell from "./board_cell/board_cell";
+import Border_List_Workers from "./border_list_workers/border_list_workers";
 
 const border_Cell = new Array(28).fill(<Board_Cell />)
 const border_Worker = new Array(8)
@@ -12,6 +13,9 @@ export default function Board() {
 
     return (
         <div className="bg-slate-600 grid grid-cols-8 grid-rows-[1fr_0.2fr_1fr_1fr_1fr_1fr] justify-center ">
+            <div>
+                <Border_List_Workers />
+            </div>
             <div className="grid grid-cols-7 grid-rows-1 col-start-2 col-end-9 row-start-2 row-end-2 justify-items-stretch align-baseline place-items-stretch">
                 {week.map((item) => <div className="border-4 text-center h-fit" key={item}>{item}</div>)}
             </div>
