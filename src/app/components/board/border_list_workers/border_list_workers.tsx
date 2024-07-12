@@ -19,7 +19,23 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
   }
   const [enterDraggbleArea, setEnterDraggbleArea] = useState(false)
   const [currentCell, setCurrentCell] = useState('')
-  console.log(currentCell)
+
+  const handleDragStart = (e: React.DragEvent<HTMLSpanElement>) => {
+    e.dataTransfer.setData('worker', e.currentTarget.id);
+    console.log('Drag started ' + e.currentTarget.id);
+  };
+
+  const handleDragDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData('worker');
+    console.log(`Element dropped: ${data}`);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    console.log('Element is being dragged over');
+  };
+
   return (
     <>
       <div className={`grid grid-cols-7 grid-rows-1  col-start-2 col-end-9 `}>
@@ -28,21 +44,17 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
             key={nanoid()}
             onDragEnter={() => setCurrentCell(item.id)}
             onDragLeave={() => setCurrentCell('none')}
-            onDragOver={() => {
-
-              setCurrentCell(item.id)
-            }
-
-            }
-            onDragEnd={() => console.log('drag end')}
-
+            onDragOver={handleDragOver}
+            onDrop={handleDragDrop}
           ><Border_list_worker_cell id={item.id} /></div>)}
-      </div>
+      </div >
       <div className="grid grid-cols-1 grid-row-4 row-start-1 m-4 gap-2">
         {Workers_List.map((item) =>
           <span className="border-2 text-center hover:cursor-pointer"
             key={nanoid()}
             draggable
+            id={item.name}
+            onDragStart={handleDragStart}
           >{item.name}</span>)}
       </div>
     </>
