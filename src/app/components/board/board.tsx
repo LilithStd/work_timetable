@@ -2,7 +2,7 @@
 import Client from "@/app/components/client/client";
 import Worker from "@/app/components/worker/worker";
 import Board_Cell from "./board_cell/board_cell";
-import Border_List_Workers from "./border_list_workers/border_list_workers";
+import Border_List_Workers from "./border_list_workers/boarder_list_workers";
 import { WORKER_LIST } from "@/app/variables/worker_list";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";

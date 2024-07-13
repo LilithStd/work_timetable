@@ -2,7 +2,7 @@
 import { WORKER_LIST } from "@/app/variables/worker_list"
 import { nanoid } from "nanoid"
 import { useState } from "react"
-import Border_list_worker_cell from "./border_list_worker_cell/border_list_worker_cell"
+import Border_list_worker_cell from "./border_list_worker_cell/boarder_list_worker_cell"
 import { DAYS_WEEK } from "@/const/const"
 
 type Border_List_Workers_Props = {
