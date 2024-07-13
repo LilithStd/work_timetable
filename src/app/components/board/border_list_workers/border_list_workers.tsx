@@ -19,34 +19,48 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
   }
   const [enterDraggbleArea, setEnterDraggbleArea] = useState(false)
   const [currentCell, setCurrentCell] = useState('')
+  const [currentWorker, setCurrentWorker] = useState('')
+  const [eventDropItem, setEventDropItem] = useState('')
+
+
+  const testArray: string[] = []
 
   const handleDragStart = (e: React.DragEvent<HTMLSpanElement>) => {
     e.dataTransfer.setData('worker', e.currentTarget.id);
-    console.log('Drag started ' + e.currentTarget.id);
+    const data = e.dataTransfer.getData('worker');
+    console.log(data)
   };
 
   const handleDragDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const data = e.dataTransfer.getData('worker');
-    console.log(`Element dropped: ${data}`);
+    setCurrentWorker(data)
+    testArray.push(currentWorker)
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    console.log('Element is being dragged over');
+    e.dataTransfer.setData('cell', e.currentTarget.id)
+    const data = e.dataTransfer.getData('cell');
   };
+
+
 
   return (
     <>
       <div className={`grid grid-cols-7 grid-rows-1  col-start-2 col-end-9 `}>
+
         {border_list_Worker.map((item) =>
           <div className={`border-2 text-center ${currentCell === item.id ? 'bg-purple-500' : ''}`}
             key={nanoid()}
             onDragEnter={() => setCurrentCell(item.id)}
-            onDragLeave={() => setCurrentCell('none')}
+            onDragLeave={() => setCurrentCell('')}
             onDragOver={handleDragOver}
             onDrop={handleDragDrop}
-          ><Border_list_worker_cell id={item.id} /></div>)}
+          ><Border_list_worker_cell
+              id={item.id}
+              name={currentWorker !== '' && currentCell === item.id ? currentWorker : ''}
+            /></div>)}
       </div >
       <div className="grid grid-cols-1 grid-row-4 row-start-1 m-4 gap-2">
         {Workers_List.map((item) =>
