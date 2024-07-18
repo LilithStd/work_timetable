@@ -1,4 +1,3 @@
-
 import Client from "@/app/components/client/client";
 import Worker from "@/app/components/worker/worker";
 import Board_Cell from "./board_cell/board_cell";

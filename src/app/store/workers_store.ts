@@ -1,77 +1,73 @@
-import { DAYS } from '@/const/const'
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { DAYS } from '@/const/const';
 
 type Data_Workers_Type = {
-    day:string,
-    name:string
-}
+  name: string;
+};
 
-type Days_Type = {
-  day:string,
-  workers:Data_Workers_Type[]
-}
-
-
+type Days_Cell_Type = {
+  day: string;
+  workers: Data_Workers_Type[];
+};
 
 interface WorkersStoreProps {
-	daysCell:Days_Type[],
-	updateWorkersList:() => void,
-  updateDayCell:({day,name}:Data_Workers_Type) => void
+  daysCell: Days_Cell_Type[];
+  addWorker: (day: string, workerName: string) => void;
 }
 
-const initialState = [
+const initialState: Days_Cell_Type[] = [
   {
-    day:DAYS.MONDAY,
-    workers:[]
+    day: DAYS.MONDAY,
+    workers: [],
   },
   {
-    day:DAYS.TUESDAY,
-    workers:[]
+    day: DAYS.TUESDAY,
+    workers: [],
   },
   {
-    day:DAYS.WEDNESDAY,
-    workers:[]
+    day: DAYS.WEDNESDAY,
+    workers: [],
   },
   {
-    day:DAYS.THURSDAY,
-    workers:[]
+    day: DAYS.THURSDAY,
+    workers: [],
   },
   {
-    day:DAYS.FRIDAY,
-    workers:[]
+    day: DAYS.FRIDAY,
+    workers: [],
   },
   {
-    day:DAYS.SATURDAY,
-    workers:[]
+    day: DAYS.SATURDAY,
+    workers: [],
   },
   {
-    day:DAYS.SUNDAYS,
-    workers:[]
-  }
+    day: DAYS.SUNDAYS,
+    workers: [],
+  },
+];
 
-]
-
-export const worker_store = create<WorkersStoreProps>()(
+export const useWorkerStore = create<WorkersStoreProps>()(
   persist(
     (set, get) => ({
-      daysCell:initialState,
-      updateWorkersList: () => {
-        return
+      daysCell: initialState,
+      addWorker: (day, workerName) => {
+        set((state) => {
+          const updatedDaysCell = state.daysCell.map((item) =>
+            item.day === day
+              ? { ...item, workers: [...item.workers, { name: workerName }] }
+              : item
+          );
+          return { daysCell: updatedDaysCell };
+        });
       },
-      updateDayCell: (data) => {
-        daysCell:get().daysCell.map((item) => item.workers.map((arrayItem) => )) 
-      }
-  //     schedule: initialState,
-  //      addWorker: (day, worker) => set((state) => ({
-  //       schedule: state.schedule.map((d) =>
-  //     d.day === day ? { ...d, workers: [...d.workers, worker] } : d
-  //   )
-  // })),
     }),
     {
       name: 'workers-storage',
-      storage: createJSONStorage(() => sessionStorage), 
-    },
-  ),
-)
+      storage: createJSONStorage(() => sessionStorage),
+      onRehydrateStorage: () => (state) => {
+        console.log('Rehydrated state:', state);
+      },
+    }
+  )
+);

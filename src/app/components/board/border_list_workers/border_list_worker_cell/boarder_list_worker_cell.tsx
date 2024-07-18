@@ -18,8 +18,6 @@ export default function Border_list_worker_cell({ id, name }: Border_list_worker
         }
     }, [name]);
 
-    console.log(workerList)
-
     return (
         <div>
             {workerList.length > 0 ? workerList.map((item) => <span key={nanoid()}>{item}</span>) : 'Default_name'}

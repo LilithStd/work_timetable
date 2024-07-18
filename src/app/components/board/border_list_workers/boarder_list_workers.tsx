@@ -4,38 +4,45 @@ import { nanoid } from "nanoid"
 import { useState } from "react"
 import Border_list_worker_cell from "./border_list_worker_cell/boarder_list_worker_cell"
 import { DAYS_WEEK } from "@/const/const"
+import useStore from "@/app/store/hook/useStoreHook"
+import dayjs from "dayjs"
+import { useWorkerStore } from "@/app/store/workers_store"
+
 
 type Border_List_Workers_Props = {
   name?: string,
   update?: boolean
 }
 export default function Border_List_Workers({ name, update }: Border_List_Workers_Props) {
-  const Workers_List = WORKER_LIST
 
+  const Workers_List = WORKER_LIST
   const border_list_Worker = DAYS_WEEK
 
-  if (update) {
 
-  }
   const [enterDraggbleArea, setEnterDraggbleArea] = useState(false)
   const [currentCell, setCurrentCell] = useState('')
   const [currentWorker, setCurrentWorker] = useState('')
   const [eventDropItem, setEventDropItem] = useState('')
+  const { daysCell, addWorker } = useWorkerStore();
+
+  if (name) {
+    addWorker('monday', name)
+  }
 
 
-  const testArray: string[] = []
+
+  console.log(daysCell)
+
 
   const handleDragStart = (e: React.DragEvent<HTMLSpanElement>) => {
     e.dataTransfer.setData('worker', e.currentTarget.id);
     const data = e.dataTransfer.getData('worker');
-    console.log(data)
   };
 
   const handleDragDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const data = e.dataTransfer.getData('worker');
     setCurrentWorker(data)
-    testArray.push(currentWorker)
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
