@@ -1,26 +1,31 @@
 'use client'
+import { useWorkerStore } from "@/app/store/workers_store";
+import { DAYS } from "@/const/const";
 import { nanoid } from "nanoid"
 import { useState, useEffect } from "react";
 
 type Border_list_worker_cell_Props = {
-    id: string,
-    name?: string
+    day: string,
 }
 
 
 
-export default function Border_list_worker_cell({ id, name }: Border_list_worker_cell_Props) {
-    const [workerList, setWorkerList] = useState<string[]>([]);
-
-    useEffect(() => {
-        if (name) {
-            setWorkerList(prevList => [...prevList, name]);
-        }
-    }, [name]);
+export default function Border_list_worker_cell({ day }: Border_list_worker_cell_Props) {
+    const workersByDaysStore = useWorkerStore((state) => state.workersByDays)
+    const workersByDays = workersByDaysStore(day)
+    const testAray = workersByDays
 
     return (
         <div>
-            {workerList.length > 0 ? workerList.map((item) => <span key={nanoid()}>{item}</span>) : 'Default_name'}
+            {testAray && testAray.length !== 0 ? testAray.map((item) =>
+                <div
+                    key={nanoid()}
+                    className="flex"
+                >
+                    {item.name}
+                </div>
+
+            ) : 'Nothing'}
         </div>
     )
 }

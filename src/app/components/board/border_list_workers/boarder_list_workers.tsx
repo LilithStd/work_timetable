@@ -23,32 +23,22 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
   const [currentCell, setCurrentCell] = useState('')
   const [currentWorker, setCurrentWorker] = useState('')
   const [eventDropItem, setEventDropItem] = useState('')
-  const { daysCell, addWorker } = useWorkerStore();
-
-  if (name) {
-    addWorker('monday', name)
-  }
-
-
-
-  console.log(daysCell)
-
+  const { daysCell, updateDaysCellsData } = useWorkerStore();
 
   const handleDragStart = (e: React.DragEvent<HTMLSpanElement>) => {
     e.dataTransfer.setData('worker', e.currentTarget.id);
-    const data = e.dataTransfer.getData('worker');
   };
 
   const handleDragDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const data = e.dataTransfer.getData('worker');
-    setCurrentWorker(data)
+    const cellData = e.currentTarget.id;
+    updateDaysCellsData(cellData, data)
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.dataTransfer.setData('cell', e.currentTarget.id)
-    const data = e.dataTransfer.getData('cell');
+
   };
 
 
@@ -60,13 +50,13 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
         {border_list_Worker.map((item) =>
           <div className={`border-2 text-center ${currentCell === item.id ? 'bg-purple-500' : ''}`}
             key={nanoid()}
+            id={item.day}
             onDragEnter={() => setCurrentCell(item.id)}
             onDragLeave={() => setCurrentCell('')}
             onDragOver={handleDragOver}
             onDrop={handleDragDrop}
           ><Border_list_worker_cell
-              id={item.id}
-              name={currentWorker !== '' && currentCell === item.id ? currentWorker : ''}
+              day={item.day}
             /></div>)}
       </div >
       <div className="grid grid-cols-1 grid-row-4 row-start-1 m-4 gap-2">
