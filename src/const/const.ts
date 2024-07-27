@@ -19,3 +19,6 @@ export const DAYS_WEEK = [
     { id: '7', day: DAYS.SUNDAYS, data: '7' }
 ]
 
+export const COUNT_CLIENTS_PER_DAY:number = 3
+export const COUNT_WORKERS_PER_DAYS:number = 3
+export const COUNT_WORKERS_PER_DAY:number = 2

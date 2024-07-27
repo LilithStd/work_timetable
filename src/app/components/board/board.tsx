@@ -26,11 +26,11 @@ export default function Board() {
             <div className="grid grid-cols-7 grid-rows-1 col-start-2 col-end-9 row-start-2 row-end-2 justify-items-stretch align-baseline place-items-stretch">
                 {DAYS_WEEK.map((item) => <div className={`border-4 text-center h-fit grid ${day === item.day ? 'bg-yellow-500' : ''}`} key={nanoid()}>{item.day}<span>{item.data}</span></div>)}
             </div>
-            <aside className="grid grid-cols-1 row-start-3 row-end-7 gap-2 border-2">
-                {time.map((item) => <div className=" m-6 p-6 border-2 text-center" key={nanoid()}>{item}</div>)}
+            <aside className="grid grid-cols-1 row-start-3 row-end-7 gap-2 divide-y items-center">
+                {time.map((item) => <div className="m-6 p-6 text-center border-2" key={nanoid()}>{item}</div>)}
             </aside>
-            <div className="grid grid-cols-7 grid-rows-4 col-start-2 col-end-9 row-start-3 row-end-7 gap-2 divide-x divide-y">
-                {border_Cell.map((item) => <div className="text-center border-2 hover:bg-sky-700" key={nanoid()}>{item}</div>)}
+            <div className="grid grid-cols-7 grid-rows-4 col-start-2 col-end-9 row-start-3 row-end-7 divide-x divide-y">
+                {border_Cell.map((item) => <div className="text-center hover:bg-sky-700" key={nanoid()}>{item}</div>)}
             </div>
         </div>
     )

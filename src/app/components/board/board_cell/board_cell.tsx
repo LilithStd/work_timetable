@@ -1,38 +1,36 @@
 import Worker from "../../worker/worker"
 import Client from "../../client/client"
+import { COUNT_CLIENTS_PER_DAY, COUNT_WORKERS_PER_DAY, COUNT_WORKERS_PER_DAYS } from "@/const/const"
+import { nanoid } from "nanoid"
 
 type Board_Cell = {
     worker?: string,
     client?: string
 }
 
+const CLIENTS = new Array(COUNT_CLIENTS_PER_DAY).fill(<Client />)
+const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(<Worker />)
+const WORKERS = new Array(COUNT_WORKERS_PER_DAYS).fill(WORKER)
+
 export default function Board_Cell({ worker, client }: Board_Cell) {
     return (
         <div className="grid grid-cols-2 grid-rows-3">
-            <div className="grid row-start-1 row-end-4 divide-y">
-                <div className="hover:bg-orange-500 ">
-                    <Client />
-                </div>
-                <div className="hover:bg-orange-500 ">
-                    <Client />
-                </div>
-                <div className="hover:bg-orange-500 ">
-                    <Client />
-                </div>
+            <div className="grid row-start-1 row-end-4 items-center  divide-y">
+                {CLIENTS.map((item) =>
+                    <div
+                        className="hover:bg-orange-500 grid min-h-14 items-center"
+                        key={nanoid()}
+                    >
+                        {item}
+                    </div>)
+                }
             </div>
-            <div className="grid row-start-1 row-end-4 gap-2 divide-y">
-                <div className="hover:bg-violet-700 divide-y divide-x grid gap-1">
-                    <Worker />
-                    <Worker />
-                </div>
-                <div className="hover:bg-violet-700 divide-y divide-x grid gap-1">
-                    <Worker />
-                    <Worker />
-                </div>
-                <div className="hover:bg-violet-700 divide-y divide-x grid gap-1">
-                    <Worker />
-                    <Worker />
-                </div>
+            <div className="grid row-start-1 row-end-4 divide-y items-center">
+                {WORKERS.map((item) =>
+                    <div className="hover:bg-violet-700 divide-y-2 divide-x-2 grid gap-y-1 items-center min-h-14">
+                        {item}
+                    </div>)
+                }
             </div>
         </div>
     )
