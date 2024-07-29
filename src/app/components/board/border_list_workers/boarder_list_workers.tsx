@@ -34,6 +34,7 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
     const data = e.dataTransfer.getData('worker');
     const cellData = e.currentTarget.id;
     updateDaysCellsData(cellData, data)
+    setCurrentCell('')
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -46,7 +47,6 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
   return (
     <>
       <div className={`grid grid-cols-7 grid-rows-1  col-start-2 col-end-9 `}>
-
         {border_list_Worker.map((item) =>
           <div className={`border-2 text-center ${currentCell === item.id ? 'bg-purple-500' : ''}`}
             key={nanoid()}

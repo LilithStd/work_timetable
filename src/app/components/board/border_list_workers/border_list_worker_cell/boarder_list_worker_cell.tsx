@@ -13,11 +13,10 @@ type Border_list_worker_cell_Props = {
 export default function Border_list_worker_cell({ day }: Border_list_worker_cell_Props) {
     const workersByDaysStore = useWorkerStore((state) => state.workersByDays)
     const workersByDays = workersByDaysStore(day)
-    const testAray = workersByDays
 
     return (
         <div>
-            {testAray && testAray.length !== 0 ? testAray.map((item) =>
+            {workersByDays && workersByDays.length !== 0 ? workersByDays.map((item) =>
                 <div
                     key={nanoid()}
                     className="flex"

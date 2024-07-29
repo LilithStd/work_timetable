@@ -8,8 +8,8 @@ type Board_Cell = {
     client?: string
 }
 
-const CLIENTS = new Array(COUNT_CLIENTS_PER_DAY).fill(<Client />)
-const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(<Worker />)
+const CLIENTS = new Array(COUNT_CLIENTS_PER_DAY).fill(<Client template />)
+const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(<Worker template />)
 const WORKERS = new Array(COUNT_WORKERS_PER_DAYS).fill(WORKER)
 
 export default function Board_Cell({ worker, client }: Board_Cell) {
@@ -27,7 +27,7 @@ export default function Board_Cell({ worker, client }: Board_Cell) {
             </div>
             <div className="grid row-start-1 row-end-4 divide-y items-center">
                 {WORKERS.map((item) =>
-                    <div className="hover:bg-violet-700 divide-y-2 divide-x-2 grid gap-y-1 items-center min-h-14">
+                    <div className="  divide-x grid gap-y-1 items-center min-h-14">
                         {item}
                     </div>)
                 }
