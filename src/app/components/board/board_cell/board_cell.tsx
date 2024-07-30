@@ -8,7 +8,7 @@ type Board_Cell = {
     client?: string
 }
 
-const CLIENTS = new Array(COUNT_CLIENTS_PER_DAY).fill(<Client template />)
+const CLIENTS = new Array(COUNT_CLIENTS_PER_DAY).fill(<Client />)
 const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(<Worker template />)
 const WORKERS = new Array(COUNT_WORKERS_PER_DAYS).fill(WORKER)
 
