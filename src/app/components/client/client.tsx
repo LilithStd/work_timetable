@@ -1,21 +1,29 @@
 'use client'
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Edit_Modal_Window from "./components/edit_modal_window"
 import { useClientStore } from "@/app/store/client_store"
+import { nanoid } from "nanoid"
 
 type Client_Props = {
+    id: string,
     name?: string,
     template?: boolean
 }
 
-export default function Client({ name, template }: Client_Props) {
-    const setEditStatus = useClientStore((state) => state.setEditStatus)
-    const globalEditStatus = useClientStore((state) => state.editOpenStatus)
-    const [clientName, setClientName] = useState('default')
+export default function Client({ id, name, template }: Client_Props) {
+    const currentId = id
+    const { clientName, setClientName, editOpenStatus, setEditStatus } = useClientStore()
+    const [clientNameComponent, setClientNameComponent] = useState('')
     const [showModal, setShowModal] = useState(false)
+    useEffect(() => {
+        if (clientName.name !== '' && clientName.id === currentId) {
+            setClientNameComponent(clientName.name)
+        }
+    }, [clientName]
+    )
     const editOpenHandler = () => {
-        if (globalEditStatus) {
+        if (editOpenStatus) {
             return
         } else {
             setEditStatus(true)
@@ -30,20 +38,23 @@ export default function Client({ name, template }: Client_Props) {
     return (
 
         <div className={`rounded opacity-100`}>
-            {clientName === 'default' ?
+            {clientNameComponent === '' ?
                 <>
                     <button
                         onClick={editOpenHandler}
-                        disabled={globalEditStatus}
+                        disabled={editOpenStatus}
                     >
                         EDIT
                     </button>
-                    < Edit_Modal_Window show={showModal} close={editCloseHandler} />
+                    < Edit_Modal_Window
+                        show={showModal}
+                        close={editCloseHandler}
+                        id={currentId} />
                 </>
 
                 :
                 <span>
-                    {clientName}
+                    {clientNameComponent}
                 </span>
             }
 

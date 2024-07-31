@@ -13,7 +13,7 @@ const month = dataNow.format('MMMM')
 const data = dataNow.format('D')
 const day = dataNow.format('dddd')
 
-const border_Cell = new Array(28).fill(<Board_Cell />)
+const border_Cell = new Array(28).fill(null).map(() => <Board_Cell id={nanoid()} />)
 const time = ['10:00', '11:00', '12:00', '14:00']
 
 
