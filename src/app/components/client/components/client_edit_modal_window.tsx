@@ -14,7 +14,7 @@ type Edit_Modal_Window_Props = {
     id: string
 }
 
-export default function Edit_Modal_Window({ id, show, close }: Edit_Modal_Window_Props) {
+export default function Client_Edit_Modal_Window({ id, show, close }: Edit_Modal_Window_Props) {
 
     const [editClientName, setEditClientName] = useState('')
     const { setClientName } = useClientStore()

@@ -13,8 +13,10 @@ type Days_Cell_Type = {
 
 interface WorkersStoreProps {
   daysCell: Days_Cell_Type[];
+  currentDayEdit: string;
   updateDaysCellsData: (day: string, workerName: string) => void;
   workersByDays: (day: string) => Data_Workers_Type[];
+  currentDayEditCell: (day:string) => void;
 }
 
 const initialState: Days_Cell_Type[] = [
@@ -51,9 +53,9 @@ const initialState: Days_Cell_Type[] = [
 export const useWorkerStore = create<WorkersStoreProps>()(
     (set, get) => ({
       daysCell: initialState,
+      currentDayEdit:'',
       updateDaysCellsData: (day, workerName) => {
         set((state) => {
-          
           const updatedDaysCell = state.daysCell.map((item) =>
             item.day === day && !item.workers.find((worker) => worker.name === workerName )
               ? { ...item, workers: [...item.workers, { name: workerName }] }
@@ -65,6 +67,9 @@ export const useWorkerStore = create<WorkersStoreProps>()(
       workersByDays: (day) => {
         const dayCell = get().daysCell.find((item) => item.day === day);
         return dayCell ? dayCell.workers : [];
+      },
+      currentDayEditCell: (day) => {
+        get().currentDayEdit = day
       },
     }),
 );

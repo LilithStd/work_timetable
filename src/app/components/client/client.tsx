@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import Edit_Modal_Window from "./components/edit_modal_window"
+import Edit_Modal_Window from "./components/client_edit_modal_window"
 import { useClientStore } from "@/app/store/client_store"
 import { nanoid } from "nanoid"
 
