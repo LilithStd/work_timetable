@@ -1,12 +1,14 @@
 'use client'
 import { WORKER_LIST } from "@/app/variables/worker_list"
 import { nanoid } from "nanoid"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Border_list_worker_cell from "./border_list_worker_cell/boarder_list_worker_cell"
 import { DAYS_WEEK } from "@/const/const"
 import useStore from "@/app/store/hook/useStoreHook"
 import dayjs from "dayjs"
 import { useWorkerStore } from "@/app/store/workers_store"
+import { User } from "@/const/types"
+
 
 
 type Border_List_Workers_Props = {
@@ -44,6 +46,15 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
 
 
 
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    fetch('/api/users')
+      .then((response) => response.json())
+      .then((data: User[]) => setUsers(data))
+      .catch((error) => console.error('Ошибка при получении данных:', error));
+  }, []);
+  console.log(users)
   return (
     <>
       <div className={`grid grid-cols-7 grid-rows-1  col-start-2 col-end-9 `}>

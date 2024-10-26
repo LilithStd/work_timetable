@@ -20,7 +20,7 @@ export default function Client({ id, name, template }: Client_Props) {
         if (clientName.name !== '' && clientName.id === currentId) {
             setClientNameComponent(clientName.name)
         }
-    }, [clientName]
+    }, [clientName, currentId]
     )
     const editOpenHandler = () => {
         if (editOpenStatus) {
@@ -53,9 +53,21 @@ export default function Client({ id, name, template }: Client_Props) {
                 </>
 
                 :
-                <span>
-                    {clientNameComponent}
-                </span>
+                <>
+                    <button
+                        onClick={editOpenHandler}
+                        disabled={editOpenStatus}
+                    >
+                        <span>
+                            {clientNameComponent}
+                        </span>
+                    </button>
+                    < Edit_Modal_Window
+                        show={showModal}
+                        close={editCloseHandler}
+                        id={currentId} />
+                </>
+
             }
 
         </div>

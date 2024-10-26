@@ -30,3 +30,4 @@ export const useDateStore = create<Week_and_days_Props>()(
       setCurrentDay: (day) => set(() => ({ currentDay: day })),
     }),
 );
+
