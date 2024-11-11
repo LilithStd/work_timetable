@@ -14,18 +14,23 @@ type Worker_Props = {
 
 export default function Worker({ id, name, day, count, template }: Worker_Props) {
     const currentId = id
+    const { editOpenStatus, setEditOpenStatus } = useWorkerStore()
     const [showModal, setShowModal] = useState(false)
     const editOpenHandler = () => {
-
-        setShowModal(true)
-
+        if (editOpenStatus) {
+            return
+        } else {
+            setEditOpenStatus(true)
+            setShowModal(true)
+        }
 
     }
     const editCloseHandler = () => {
+        setEditOpenStatus(false)
         setShowModal(false)
 
     }
-    const workersByDaysStore = useWorkerStore((state) => state.workersByDays)
+
 
 
     return (

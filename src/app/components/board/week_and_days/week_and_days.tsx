@@ -35,6 +35,7 @@ const WeekAndDays = () => {
   // Получаем из стора текущие данные и функции для их обновления
   const { currentWeek, currentDay, setCurrentWeek, setCurrentDay } = useDateStore();
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0); // Индекс текущей отображаемой недели
+  const [weekInMonth, setWeekInMonth] = useState(1);
 
   const fillMonth = () => {
     const daysInMonth = dayjs().daysInMonth(); // количество дней в месяце
@@ -50,7 +51,7 @@ const WeekAndDays = () => {
       currentWeek[weekDay] = day;
 
       // Если это воскресенье, добавляем неделю в массив и создаем новую
-      if (weekDay === 'Sunday') {
+      if (weekDay === 'Sunday' || day === daysInMonth) {
         updatedMonth.push(currentWeek);
         currentWeek = { Monday: '', Tuesday: '', Wednesday: '', Thursday: '', Friday: '', Saturday: '', Sunday: '' };
       }
@@ -72,14 +73,25 @@ const WeekAndDays = () => {
 
   // const currentWeekIndex = getCurrentWeekIndex();
 
-  const weekToDisplay = currentWeek[currentWeekIndex]; // Неделя для отображения
+  // const weekToDisplay = currentWeek[currentWeekIndex]; // Неделя для отображения
 
   // Определяем индекс текущей недели
 
+  const updateWeekInMonth = () => {
+    setWeekInMonth(currentWeekIndex + 1); // Обновляем `weekInMonth` в зависимости от `currentWeekIndex`
+  };
+
   useEffect(() => {
-    const initialWeekIndex = getCurrentWeekIndex();
-    setCurrentWeekIndex(initialWeekIndex); // Устанавливаем текущую неделю как начальную
+    if (currentWeek.length > 0) {
+      const initialWeekIndex = getCurrentWeekIndex();
+      setCurrentWeekIndex(initialWeekIndex);
+      setWeekInMonth(initialWeekIndex + 1); // Устанавливаем `weekInMonth` при инициализации
+    }
   }, [currentWeek]);
+
+  useEffect(() => {
+    updateWeekInMonth(); // Обновляем `weekInMonth` при изменении `currentWeekIndex`
+  }, [currentWeekIndex]);
 
   // Функции для переключения между неделями
   const goToPreviousWeek = () => {
@@ -94,7 +106,8 @@ const WeekAndDays = () => {
     }
   };
 
-  console.log(currentWeek)
+  const weekToDisplay = currentWeek[currentWeekIndex];
+
 
   return (
     <div className="grid grid-cols-7 grid-rows-2 col-start-2 col-end-9">

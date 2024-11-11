@@ -13,10 +13,12 @@ type Days_Cell_Type = {
 
 interface WorkersStoreProps {
   daysCell: Days_Cell_Type[];
+  editOpenStatus:boolean;
   currentDayEdit: string;
   updateDaysCellsData: (day: string, workerName: string) => void;
   workersByDays: (day: string) => Data_Workers_Type[];
   currentDayEditCell: (day:string) => void;
+  setEditOpenStatus: (status:boolean) => void;
 }
 
 const initialState: Days_Cell_Type[] = [
@@ -53,6 +55,7 @@ const initialState: Days_Cell_Type[] = [
 export const useWorkerStore = create<WorkersStoreProps>()(
     (set, get) => ({
       daysCell: initialState,
+      editOpenStatus:false,
       currentDayEdit:'',
       updateDaysCellsData: (day, workerName) => {
         set((state) => {
@@ -71,5 +74,7 @@ export const useWorkerStore = create<WorkersStoreProps>()(
       currentDayEditCell: (day) => {
         get().currentDayEdit = day
       },
+      setEditOpenStatus: (status) => 
+        set({ editOpenStatus: status }),
     }),
 );

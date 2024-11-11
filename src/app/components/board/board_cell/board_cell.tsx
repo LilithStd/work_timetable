@@ -1,11 +1,12 @@
 import Worker from "../../worker/worker"
 import Client from "../../client/client"
-import { COUNT_CLIENTS_PER_DAY, COUNT_WORKERS_PER_DAY, COUNT_WORKERS_PER_DAYS } from "@/const/const"
+import { COUNT_CLIENTS_PER_DAY, COUNT_WORKERS_PER_DAY, COUNT_WORKERS_PER_DAYS, TIME_TO_CLIENT_PER_DAY } from "@/const/const"
 import { nanoid } from "nanoid"
 
 type Board_Cell = {
     id: string,
     day: string,
+    time: string,
     worker?: string,
     client?: string
 }
@@ -13,10 +14,14 @@ type Board_Cell = {
 
 
 
-export default function Board_Cell({ id, day, worker, client }: Board_Cell) {
-    const CLIENTS = new Array(COUNT_CLIENTS_PER_DAY).fill(null).map(() => <Client id={nanoid()} key={nanoid()} />)
-    const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(null).map(() => <Worker id={nanoid()} key={nanoid()} day={day} />)
+export default function Board_Cell({ id, time, day, worker, client }: Board_Cell) {
+    const CLIENTS = new Array(3).fill(null).map(() =>
+        <Client id={nanoid()} key={nanoid()} day={day} time={time} />
+    );
+    const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(null).map(() =>
+        <Worker id={nanoid()} key={nanoid()} day={day} />)
     const WORKERS = new Array(COUNT_WORKERS_PER_DAYS).fill(WORKER)
+
     return (
         <div className="grid grid-cols-2 grid-rows-3">
             <div className="grid row-start-1 row-end-4 items-center  divide-y">

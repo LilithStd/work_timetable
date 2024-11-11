@@ -54,7 +54,7 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
       .then((data: User[]) => setUsers(data))
       .catch((error) => console.error('Ошибка при получении данных:', error));
   }, []);
-  console.log(users)
+
   return (
     <>
       <div className={`grid grid-cols-7 grid-rows-1  col-start-2 col-end-9 `}>
