@@ -1,7 +1,10 @@
+'use client'
 import Worker from "../../worker/worker"
 import Client from "../../client/client"
 import { COUNT_CLIENTS_PER_DAY, COUNT_WORKERS_PER_DAY, COUNT_WORKERS_PER_DAYS, TIME_TO_CLIENT_PER_DAY } from "@/const/const"
 import { nanoid } from "nanoid"
+import { useEffect } from "react"
+import { useClientStore } from "@/app/store/client_store"
 
 type Board_Cell = {
     id: string,

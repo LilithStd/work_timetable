@@ -1,11 +1,7 @@
-
 import Board from "@/app/components/board/board";
-import dayjs from "dayjs";
-const dataNow = dayjs()
-const daysOfMonth = dataNow.daysInMonth();
-const daysWeek = new Array(7).fill(null).map(() => { })
 
 export default function MainPages() {
+
   return (
     <main>
       <Board />

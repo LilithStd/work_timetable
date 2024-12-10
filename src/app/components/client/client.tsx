@@ -9,26 +9,37 @@ import { DAYS } from "@/const/const"
 type Client_Props = {
     id: string,
     day: string,
-    time?: string,
+    time: string,
     name?: string,
     template?: boolean
 }
 
 export default function Client({ id, time, day, name, template }: Client_Props) {
     const currentId = id
-    const { clientName, setClientName, editOpenStatus, updateClientByDaysData, setEditStatus, clientByDay } = useClientStore()
+    const { clientName, setClientName, editOpenStatus, updateClientByDaysData, statusDataFromDB, searchViewClient, addClientCompleted, setEditStatus, getDataDB, clientByDay, searchClient, clientDataAction } = useClientStore()
     const [clientNameComponent, setClientNameComponent] = useState('')
     const [showModal, setShowModal] = useState(false)
-    const [clientTime, setClientTime] = useState(time ? time : '');
-    const [ids, setID] = useState('');
+    const [clientTime, setClientTime] = useState('EDIT');
 
-
+    // useEffect(() => {
+    //     if (statusDataFromDB) {
+    //         console.log(clientByDay)
+    //     } else {
+    //         getDataDB()
+    //         console.log(clientByDay)
+    //     }
+    // }, [])
+    // console.log()
 
     useEffect(() => {
-        if (clientName.name !== '' && clientName.id === currentId) {
-            setClientNameComponent(clientName.name)
+        const object = {
+            day: day, id: currentId, time: time
         }
-    }, [clientName, currentId]
+        const tempResult = searchClient(object)
+
+        setClientNameComponent(tempResult)
+
+    }, [clientNameComponent, currentId, day, searchClient, time]
     )
     const editOpenHandler = () => {
         if (editOpenStatus) {
@@ -41,50 +52,32 @@ export default function Client({ id, time, day, name, template }: Client_Props) 
         }
     }
     const editCloseHandler = () => {
+        setClientNameComponent(searchClient({ day: day, id: currentId, time: time }))
         setShowModal(false)
         setEditStatus(false)
-        // console.log(clientByDay)
     }
 
     return (
 
         <div className={`rounded opacity-100`}>
-            {clientNameComponent === '' ?
-                <>
-                    <button
-                        onClick={editOpenHandler}
-                        disabled={editOpenStatus}
-                    >
-                        EDIT
-                    </button>
-                    < Edit_Modal_Window
-                        show={showModal}
-                        day={day}
-                        time={time ? time : ''}
-                        close={editCloseHandler}
-                        id={currentId} />
-                </>
-
-                :
-                <>
-                    <button
-                        onClick={editOpenHandler}
-                        disabled={editOpenStatus}
-                    >
-                        <span>
-                            {clientNameComponent}
-                        </span>
-                    </button>
-                    < Edit_Modal_Window
-                        show={showModal}
-                        day={day}
-                        time={time ? time : ''}
-                        close={editCloseHandler}
-                        id={currentId} />
-                </>
-
-            }
-
+            <>
+                <button
+                    onClick={editOpenHandler}
+                    disabled={editOpenStatus}
+                >
+                    <span>
+                        {clientNameComponent}
+                    </span>
+                </button>
+                < Edit_Modal_Window
+                    show={showModal}
+                    day={day}
+                    time={time}
+                    close={editCloseHandler}
+                    id={currentId}
+                    name={setClientTime}
+                />
+            </>
         </div>
     )
 }

@@ -1,7 +1,9 @@
 'use client'
 
 import { useClientStore } from "@/app/store/client_store"
-import { DAYS, DAYS_WEEK, TIME_TO_CLIENT, TIME_TO_CLIENT_PER_DAY } from "@/const/const"
+import { DATA_BASE_ACTIONS } from "@/const/baseActions"
+import { CLIENT_DATA_STATUS, DAYS, DAYS_WEEK, TIME_TO_CLIENT, TIME_TO_CLIENT_PER_DAY } from "@/const/const"
+import { nanoid } from "nanoid"
 import { useEffect, useState } from "react"
 
 type DataTypes = {
@@ -12,21 +14,24 @@ type DataTypes = {
 type Edit_Modal_Window_Props = {
     show: boolean,
     day: string,
-    time?: string,
+    time: string,
     close: () => void,
+    name: (props: string) => void,
     id: string
 }
 
-export default function Client_Edit_Modal_Window({ time, id, day, show, close }: Edit_Modal_Window_Props) {
-    const { sendDataToDB, clientName, updateClientByDaysData, setClientName, setClientData } = useClientStore()
-    const [editClientName, setEditClientName] = useState(clientName.name || '')
-
+export default function Client_Edit_Modal_Window({ time, id, day, show, close, name }: Edit_Modal_Window_Props) {
+    const { sendDataToDB, clientName, searchViewClient, updateClientByDaysData, checkClientData, clientByDay, setClientName, setClientData } = useClientStore()
+    // const [editClientName, setEditClientName] = useState(clientName.name || '')
+    const [editClientName, setEditClientName] = useState('')
+    const [error, setError] = useState(null)
 
     useEffect(() => {
-        if (clientName.name) {
-            setEditClientName(clientName.name);
+        if (searchViewClient(id, day, time)) {
+            setEditClientName(searchViewClient(id, day, time));
         }
-    }, [clientName.name]);
+    }, [day, id, searchViewClient, time]);
+
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEditClientName(event.target.value);
@@ -34,27 +39,32 @@ export default function Client_Edit_Modal_Window({ time, id, day, show, close }:
 
     const submitHandler = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        setClientName({ id: id, name: editClientName })
+        if (editClientName === '') {
+            setEditClientName('')
+            close()
+        } else {
+            if (checkClientData(id, editClientName, day)) {
+                setClientName({ id: id, name: editClientName })
+                name(editClientName)
+                setClientData(id, day, CLIENT_DATA_STATUS.CHECK_CLIENT_DATA, { timeToClient: { id: '58ElfngPGzm5YcXYY6Gl3', time: time, name: editClientName } })
+                // setClientData(id, day, CLIENT_DATA_STATUS.CHECK_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } })
+                // setClientData(id, day, CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } })
+                setEditClientName('')
+                close()
+            } else {
+                setClientName({ id: id, name: editClientName })
+                setClientData(id, day, CLIENT_DATA_STATUS.ADD_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } })
+                name(editClientName)
+                setEditClientName('')
+                close()
+            }
+        }
 
-        // sendDataToDB()
-        setClientData(id, day, { timeToClient: { time: TIME_TO_CLIENT_PER_DAY.FIRST_TIME, name: editClientName } })
-        setEditClientName('')
-        close()
     };
     if (!show) {
         return null
     }
 
-
-    const props = {
-        id: '',
-        day: DAYS.MONDAY,
-        time: TIME_TO_CLIENT,
-        clientName: ''
-    }
-
-
-    console.log(time)
     return (
         <div className="fixed w-56 h-60 bg-white grid grid-cols-2 grid-rows-3">
             <label className="grid col-start-1 col-end-2 row-start-2 row-end-2">

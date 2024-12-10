@@ -48,12 +48,14 @@ export default function Border_List_Workers({ name, update }: Border_List_Worker
 
   const [users, setUsers] = useState<User[]>([]);
 
-  useEffect(() => {
-    fetch('/api/users')
-      .then((response) => response.json())
-      .then((data: User[]) => setUsers(data))
-      .catch((error) => console.error('Ошибка при получении данных:', error));
-  }, []);
+  // useEffect(() => {
+  //   fetch('/api/users')
+  //     .then((response) => response.json())
+  //     .then((data: User[]) => setUsers(data))
+  //     .catch((error) => console.error('Ошибка при получении данных:', error));
+  // }, []);
+
+  // console.log(users)
 
   return (
     <>

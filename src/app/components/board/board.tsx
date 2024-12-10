@@ -5,9 +5,10 @@ import Border_List_Workers from "./border_list_workers/boarder_list_workers";
 import { WORKER_LIST } from "@/app/variables/worker_list";
 import { nanoid } from "nanoid";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DAYS_WEEK, TIME_TO_CLIENT } from "@/const/const";
 import WeekAndDays from "./week_and_days/week_and_days";
+import { useClientStore } from "@/app/store/client_store";
 
 const dataNow = dayjs()
 const month = dataNow.format('MMMM')
@@ -21,8 +22,6 @@ const days_week_cell = new Array(4).fill(null)
 
 
 export default function Board() {
-
-
     return (
         <div className="bg-slate-600 grid grid-cols-8 grid-rows-[1fr_0.2fr_1fr_1fr_1fr_1fr] justify-center ">
             <Border_List_Workers />
