@@ -47,19 +47,42 @@ type ClientDaysType = {
     client:ClientDayType[]
 }
 
+type TimeToClient = {
+  id: string;
+  time: string;
+  name?: string;
+};
+
+type DocumentData = {
+  _id: string;
+  data: DayData[];
+};
+
+type Client = {
+  timeToClient: TimeToClient;
+};
+
+type DayData = {
+  id: string;
+  day: string;
+  client: Client[];
+};
+
 type useClientStoreProps = {
-    clientByDay:ClientDaysType[],
+    clientByDay:DocumentData[],
     editOpenStatus:boolean,
     clientName:ClientNameProps,
-    // clientData:{}
+    // clientData:{},
+    dbid:string,
     clientDataStatus:string,
     clientDataAction:string,
     loadingDB:boolean,
     statusDataFromDB:boolean,
     error:string | null,
     addClientCompleted:boolean,
+    updateClient:boolean,
     getDataDB:() => void,
-    updateClientByDaysData:(data:UpdateClientProps) => void,
+    // updateClientByDaysData:(data:UpdateClientProps) => void,
     checkClientData:(name:string, day:string,time:string, update?:boolean) => boolean,
     setEditStatus: (status:boolean) => void,
     searchViewClient: (id:string,day:string,time:string) => string,
@@ -68,46 +91,89 @@ type useClientStoreProps = {
     searchClient:(criteria: {day:string, id:string, time:string}) => string,
     setClientData:(id:string,day:string, status:string, data:ClientDayType) => void,
     // sendDataToDB:(day:string, data:ClientDayType) => void
+    setDBid:() => void,
     sendDataToDB:(status:string,data:{day:string, clientData:ClientDayType }) => void
 }
-
-const initialState: ClientDaysType[] = [
+const initialState:DocumentData[] = [
   {
-    id:date,
-    day: DAYS.MONDAY,
-    client: [],
-  },
-  {
-    id:date,
-    day: DAYS.TUESDAY,
-    client: [],
-  },
-  {
-    id:date,
-    day: DAYS.WEDNESDAY,
-    client: [],
-  },
-  {
-    id:date,
-    day: DAYS.THURSDAY,
-    client: [],
-  },
-  {
-    id:date,
-    day: DAYS.FRIDAY,
-    client: [],
-  },
-  {
-    id:date,
-    day: DAYS.SATURDAY,
-    client: [],
-  },
-  {
-    id:date,
-    day: DAYS.SUNDAYS,
-    client: [],
-  },
-];
+    _id: '',
+    data: [
+      {
+        id:date,
+        day: DAYS.MONDAY,
+        client: [],
+      },
+      {
+        id:date,
+        day: DAYS.TUESDAY,
+        client: [],
+      },
+      {
+        id:date,
+        day: DAYS.WEDNESDAY,
+        client: [],
+      },
+      {
+        id:date,
+        day: DAYS.THURSDAY,
+        client: [],
+      },
+      {
+        id:date,
+        day: DAYS.FRIDAY,
+        client: [],
+      },
+      {
+        id:date,
+        day: DAYS.SATURDAY,
+        client: [],
+      },
+      {
+        id:date,
+        day: DAYS.SUNDAYS,
+        client: [],
+      },
+    ],
+  }
+ 
+]
+// const initialState: ClientDaysType[] = [
+//   {
+//     id:date,
+//     day: DAYS.MONDAY,
+//     client: [],
+//   },
+//   {
+//     id:date,
+//     day: DAYS.TUESDAY,
+//     client: [],
+//   },
+//   {
+//     id:date,
+//     day: DAYS.WEDNESDAY,
+//     client: [],
+//   },
+//   {
+//     id:date,
+//     day: DAYS.THURSDAY,
+//     client: [],
+//   },
+//   {
+//     id:date,
+//     day: DAYS.FRIDAY,
+//     client: [],
+//   },
+//   {
+//     id:date,
+//     day: DAYS.SATURDAY,
+//     client: [],
+//   },
+//   {
+//     id:date,
+//     day: DAYS.SUNDAYS,
+//     client: [],
+//   },
+// ];
 
 
 export const useClientStore = create<useClientStoreProps>()(
@@ -115,9 +181,11 @@ export const useClientStore = create<useClientStoreProps>()(
         clientByDay:initialState,
         editOpenStatus:false,
         clientName:{id:'',name:''},
+        dbid:'',
         loadingDB:false,
         statusDataFromDB:false,
         addClientCompleted:false,
+        updateClient:false,
         clientDataStatus:CLIENT_DATA_STATUS.STATIC_CLIENT_DATA,
         clientDataAction:DATA_BASE_ACTIONS.STATIC_CLIENT_DATA,
         error:'',
@@ -126,6 +194,7 @@ export const useClientStore = create<useClientStoreProps>()(
           try {
             const response = await fetch('/api/users');
             const data = await response.json();
+            console.log(data)
             return set({ clientByDay: data, loadingDB: false, statusDataFromDB:true });
           } catch (error) {
             console.error('Error fetching data:', error);
@@ -133,41 +202,48 @@ export const useClientStore = create<useClientStoreProps>()(
           }
         },
         searchClient: (criteria) => {
-           const resultSearch = get().clientByDay
-            .filter((element) => element.day === criteria.day) // Оставляем только нужные дни
-            .flatMap((element) => 
-              element.client
-                .filter((item) => item.timeToClient.id === criteria.id) // Фильтруем по времени
-                .map((item) => item.timeToClient.name || 'EDIT') // Возвращаем имя или "EDIT"
+          
+          const clientByDay: DocumentData[] = get().clientByDay; // Получаем данные из состояния
+
+          const resultSearch = clientByDay
+            .flatMap((document) =>
+              document.data // Перебираем массив `data` внутри каждого документа
+                .filter((dayRecord) => dayRecord.day === criteria.day) // Ищем нужный день
+                .flatMap((dayRecord) =>
+                  dayRecord.client // Перебираем массив клиентов текущего дня
+                    // .filter((client) => client.timeToClient.time === criteria.time)
+                    .filter((client) => client.timeToClient.id === criteria.id) // Фильтруем по `id`
+                    .map((client) => client.timeToClient.name || "EDIT") // Возвращаем имя или "EDIT"
+                )
             );
-            return resultSearch.length > 0 ? resultSearch[0] : 'EDIT'; // Возвращаем первый результат или "EDIT"
-            
+            return resultSearch.length > 0 ? resultSearch[0] : 'EDIT'; // Возвращаем первый результат или "EDIT"  
+        },
+        setDBid:() => {
+          set({dbid:'111'})
         },
 
-        updateClientByDaysData: ({id,day,time,clientName}:UpdateClientProps) => {
-         const storeData =  get().clientByDay.find((item) => item.day === day)
-         storeData?.client.find((client) => client)
-         return storeData
-        },
         setClientDataAction:(status) => {
           set({clientDataStatus: status})
         },
         searchViewClient: (id, day, time) => {
           let clientNameTemp = ''
-          get().clientByDay.map((element) => {
-            if(element.day === day) {
-              element.client.map((item) => {
-                if(item.timeToClient.id === id && item.timeToClient.time === time){
-                  return clientNameTemp = item.timeToClient.name
-                }
-              })
-            }
-          })
+          get().clientByDay.flatMap((document) =>
+            document.data.filter((element) => element.day === day)
+            .flatMap((item) => item.client.map((element) => {
+              if(element.timeToClient.id === id && element.timeToClient.time === time) {
+                return clientNameTemp === element.timeToClient.name
+              }
+            }))
+          )
           return clientNameTemp
         },
         checkClientData: (id,name, day,time) => {
-          return get().clientByDay.some((item) => 
-            item.day === day && item.client.some((element) => element.timeToClient.id === id))
+          return get().clientByDay.some((document) =>
+            document.data.some((item) =>
+              item.day === day &&
+              item.client.some((element) => element.timeToClient.id === id)
+            )
+          );
         },
         setEditStatus: (status) => set({ editOpenStatus: status }),
         setClientName:(data) => {
@@ -177,52 +253,74 @@ export const useClientStore = create<useClientStoreProps>()(
         setClientData: (id,day,status,data) => {
           switch(status) {
             case CLIENT_DATA_STATUS.STATIC_CLIENT_DATA :
-              get().clientByDay.find((element) => 
+              get().clientByDay.flatMap((document) => document.data.find((element) => 
                 element.day === day 
                 && element.client.find((firstArgument) => firstArgument.timeToClient.time) 
-                 && element.client.find((secondArgument) => secondArgument.timeToClient.name === data.timeToClient.name))
+                 && element.client.find((secondArgument) => secondArgument.timeToClient.name === data.timeToClient.name))) 
               break
             case CLIENT_DATA_STATUS.ADD_CLIENT_DATA:
-              set({
-                clientByDay: get().clientByDay.map((item) => {
-                  if(item.day === day && item.client.map((element) => element.timeToClient.time !== data.timeToClient.time)) {
-                     item.client.push({
-                      timeToClient:{
-                        id:data.timeToClient.id,
-                        time:data.timeToClient.time,
-                        name:data.timeToClient.name
+             set({
+                  clientByDay: get().clientByDay.map((document) => ({
+                    ...document,
+                    data: document.data.map((item) => {
+                      if (item.day === day) {
+                        // Проверяем, существует ли клиент с указанным временем
+                        const clientExists = item.client.some(
+                          (element) => element.timeToClient.id === data.timeToClient.id
+                        );
+
+                        if (!clientExists) {
+                          // Создаём новый массив клиентов с добавленным пользователем
+                          return {
+                            ...item,
+                            client: [
+                              ...item.client,
+                              {
+                                timeToClient: {
+                                  id: data.timeToClient.id,
+                                  time: data.timeToClient.time,
+                                  name: data.timeToClient.name,
+                                },
+                              },
+                            ],
+                          };
+                        }
                       }
-                     }) 
-                  }
-              return item;
-              
-            })
-          });
+                      return item; // Возвращаем элемент без изменений, если условие не выполнено
+                    }),
+                  })),
+                });
+                  set({updateClient:false})
             // get().sendDataToDB(DATA_BASE_ACTIONS.ADD_CLIENT_DATA)
             break
           case CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA:
-            set({clientByDay:get().clientByDay.map((element) =>{
-              if(element.day === day) {
-                return {
-                  ...element,
-                  client:element.client.map((client) => {
-                    if(client.timeToClient.time === data.timeToClient.time) {
+            console.log('update path')
+           set({
+                clientByDay: get().clientByDay.map((document) => ({
+                  ...document,
+                  data: document.data.map((item) => {
+                    if (item.day === day) {
                       return {
-                        ...client,
-                        timeToClient:{
-                          ...client.timeToClient,
-                          name:data.timeToClient.name
-                        },
+                        ...item,
+                        client: item.client.map((client) => {
+                          if (client.timeToClient.time === data.timeToClient.time) {
+                            return {
+                              ...client,
+                              timeToClient: {
+                                ...client.timeToClient,
+                                name: data.timeToClient.name,
+                              },
+                            };
+                          }
+                          return client;
+                        }),
                       };
                     }
-                    return client;
-                  })
-                }
-              }
-              return element
-            }
-            )});
-            get().sendDataToDB(DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA, {day:day,clientData:data})
+                    return item;
+                  }),
+                })),
+              });
+            // get().sendDataToDB(DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA, {day:day,clientData:data})
             break
             case CLIENT_DATA_STATUS.CHECK_CLIENT_DATA: 
               get().sendDataToDB(DATA_BASE_ACTIONS.CHECK_CLIENT_DATA, {day:day, clientData:data})

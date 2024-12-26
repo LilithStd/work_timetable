@@ -4,6 +4,8 @@ import { DATA_BASE_ACTIONS } from '@/const/baseActions';
 
 
 const uri = process.env.MONGODB_URI as string; // Считываем URI из переменной окружения
+const mongodb = process.env.MONGODB as string; 
+const mongodb_collections =process.env.MONGODB_COLLECIONS as string;
 let client: MongoClient;
 let db: Db;
 let usersCollection: Collection;
@@ -12,8 +14,8 @@ async function connectToDatabase() {
   if (!client) {
     client = new MongoClient(uri);
     await client.connect();
-    db = client.db('UsersWorkTimeTable'); // Укажите название вашей базы данных
-    usersCollection = db.collection('Users_Work_Time_Table'); // Название коллекции
+    db = client.db(mongodb); // Укажите название вашей базы данных
+    usersCollection = db.collection(mongodb_collections); // Название коллекции
   }
 }
 
@@ -50,28 +52,28 @@ export async function POST(request: NextRequest) {
       );
     }
     if (action === DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA) {
-      const { day, timeToClient } = requestBody
-      if (!day || !timeToClient) {
+      const { day, clientData } = requestBody
+      if (!day || !clientData) {
       return NextResponse.json(
         { error: 'Все поля обязательны' },
         { status: 400 }
       );
     }
             const result = await usersCollection.updateOne( {
-          _id: new ObjectId('673e2aea44aaf77cfdfc0696'), // Идентификатор документа
+          _id: new ObjectId('67504278651c8d810044ee8f'), // Идентификатор документа
              // Дата в массиве data
           'data.day': day, // День недели
-          'data.client.timeToClient.id': timeToClient.id, // ID клиента
+          'data.client.timeToClient.id': clientData.timeToClient.id, // ID клиента
         },
         {
           $set: {
-            'data.$[dateElem].client.$[clientElem].timeToClient.name': timeToClient.name, // Обновляем имя
+            'data.$[dateElem].client.$[clientElem].timeToClient.name': clientData.timeToClient.name, // Обновляем имя
           },
         },
         {
         arrayFilters: [
           {'dateElem.day': day }, // Фильтр для элемента даты
-          { 'clientElem.timeToClient.id': timeToClient.id }, // Фильтр для клиента
+          { 'clientElem.timeToClient.id': clientData.timeToClient.id }, // Фильтр для клиента
         ],
       }
       );
@@ -87,7 +89,6 @@ export async function POST(request: NextRequest) {
     if(action === DATA_BASE_ACTIONS.CHECK_CLIENT_DATA) {
         try {
           const { clientData } = requestBody;
-          console.log('serve ' + clientData.timeToClient.id)
           // Проверяем входные данные
           if (!clientData) {
             return NextResponse.json(

@@ -1,30 +1,19 @@
-'use client'
 
 import { useClientStore } from "@/app/store/client_store"
-import { DATA_BASE_ACTIONS } from "@/const/baseActions"
-import { CLIENT_DATA_STATUS, DAYS, DAYS_WEEK, TIME_TO_CLIENT, TIME_TO_CLIENT_PER_DAY } from "@/const/const"
-import { nanoid } from "nanoid"
+import { CLIENT_DATA_STATUS } from "@/const/const"
 import { useEffect, useState } from "react"
-
-type DataTypes = {
-    id: string,
-    name: string
-}
 
 type Edit_Modal_Window_Props = {
     show: boolean,
     day: string,
     time: string,
     close: () => void,
-    name: (props: string) => void,
     id: string
 }
 
-export default function Client_Edit_Modal_Window({ time, id, day, show, close, name }: Edit_Modal_Window_Props) {
-    const { sendDataToDB, clientName, searchViewClient, updateClientByDaysData, checkClientData, clientByDay, setClientName, setClientData } = useClientStore()
-    // const [editClientName, setEditClientName] = useState(clientName.name || '')
+export default function Client_Edit_Modal_Window({ time, id, day, show, close }: Edit_Modal_Window_Props) {
+    const { searchViewClient, checkClientData, setClientName, setClientData, clientByDay } = useClientStore()
     const [editClientName, setEditClientName] = useState('')
-    const [error, setError] = useState(null)
 
     useEffect(() => {
         if (searchViewClient(id, day, time)) {
@@ -39,28 +28,30 @@ export default function Client_Edit_Modal_Window({ time, id, day, show, close, n
 
     const submitHandler = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
+        console.log(id, clientByDay)
         if (editClientName === '') {
             setEditClientName('')
             close()
+            console.log('submit if string = 0')
+
         } else {
             if (checkClientData(id, editClientName, day)) {
                 setClientName({ id: id, name: editClientName })
-                name(editClientName)
-                setClientData(id, day, CLIENT_DATA_STATUS.CHECK_CLIENT_DATA, { timeToClient: { id: '58ElfngPGzm5YcXYY6Gl3', time: time, name: editClientName } })
-                // setClientData(id, day, CLIENT_DATA_STATUS.CHECK_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } })
-                // setClientData(id, day, CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } })
+                setClientData(id, day, CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } })
+                console.log('update branch')
                 setEditClientName('')
                 close()
             } else {
                 setClientName({ id: id, name: editClientName })
                 setClientData(id, day, CLIENT_DATA_STATUS.ADD_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } })
-                name(editClientName)
+                console.log('submit add branch')
                 setEditClientName('')
                 close()
             }
         }
 
     };
+
     if (!show) {
         return null
     }

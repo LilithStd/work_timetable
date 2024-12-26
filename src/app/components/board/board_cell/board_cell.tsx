@@ -1,10 +1,11 @@
-'use client'
+
 import Worker from "../../worker/worker"
 import Client from "../../client/client"
 import { COUNT_CLIENTS_PER_DAY, COUNT_WORKERS_PER_DAY, COUNT_WORKERS_PER_DAYS, TIME_TO_CLIENT_PER_DAY } from "@/const/const"
 import { nanoid } from "nanoid"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useClientStore } from "@/app/store/client_store"
+import { User } from "@/const/types"
 
 type Board_Cell = {
     id: string,
@@ -18,12 +19,16 @@ type Board_Cell = {
 
 
 export default function Board_Cell({ id, time, day, worker, client }: Board_Cell) {
+
+
     const CLIENTS = new Array(3).fill(null).map(() =>
         <Client id={nanoid()} key={nanoid()} day={day} time={time} />
     );
     const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(null).map(() =>
         <Worker id={nanoid()} key={nanoid()} day={day} />)
     const WORKERS = new Array(COUNT_WORKERS_PER_DAYS).fill(WORKER)
+
+
 
     return (
         <div className="grid grid-cols-2 grid-rows-3">

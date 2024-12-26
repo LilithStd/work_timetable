@@ -1,13 +1,5 @@
-'use client'
-
 import { useWorkerStore } from "@/app/store/workers_store"
 import { nanoid } from "nanoid"
-import { useState } from "react"
-
-type DataTypes = {
-    id: string,
-    name: string
-}
 
 type Edit_Modal_Window_Props = {
     show: boolean,
