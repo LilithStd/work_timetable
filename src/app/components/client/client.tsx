@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import Client_Edit_Modal_Window from "./components/client_edit_modal_window"
 import { useClientStore } from "@/app/store/client_store"
+import { useDateStore } from "@/app/store/date_strore"
 
 type Client_Props = {
     id: string,
@@ -13,7 +14,8 @@ type Client_Props = {
 
 export default function Client({ id, time, day, name, template }: Client_Props) {
     const currentId = id
-    const { editOpenStatus, setEditStatus, searchClient, updateClient, clientName } = useClientStore()
+    const { editOpenStatus, setEditStatus, searchClient, clientByDay } = useClientStore()
+    const { numberCurrentWeekInMonth } = useDateStore()
     const [clientNameComponent, setClientNameComponent] = useState('')
     const [showModal, setShowModal] = useState(false)
 
@@ -21,34 +23,30 @@ export default function Client({ id, time, day, name, template }: Client_Props) 
     useEffect(() => {
         const object = {
             day: day, id: currentId, time: time
-            // day: day, id: currentId, time: time
         }
         const tempResult = searchClient(object)
 
         setClientNameComponent(tempResult)
 
-    }, [currentId, day, searchClient, time, updateClient]
+    }, [currentId, day, searchClient, time]
     )
 
     const editOpenHandler = () => {
-        setEditStatus(true)
-        setShowModal(true)
-        // if (editOpenStatus) {
-        //     return
-        // } else {
-        //     setEditStatus(true)
-        //     setShowModal(true)
-        // }
+        if (editOpenStatus) {
+            return
+        } else {
+            setEditStatus(true)
+            setShowModal(true)
+        }
     }
     const editCloseHandler = () => {
         setClientNameComponent(searchClient({ day: day, id: currentId, time: time }))
-        // const temp = searchClient({ day: day, id: '58ElfngPGzm5YcXYY6Gl3', time: time })
-        // setClientNameComponent(temp);
-        // console.log(searchClient({ day: day, id: currentId, time: time }))
         setShowModal(false);
         setEditStatus(false);
 
     }
+
+    // console.log(clientByDay)
 
     return (
         <div className={`rounded opacity-100`}>
@@ -58,7 +56,6 @@ export default function Client({ id, time, day, name, template }: Client_Props) 
                     disabled={editOpenStatus}
                 >
                     <span>
-                        {/* {clientName} */}
                         {clientNameComponent}
                     </span>
                 </button>

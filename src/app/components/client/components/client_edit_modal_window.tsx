@@ -1,6 +1,8 @@
 
 import { useClientStore } from "@/app/store/client_store"
+import { useDateStore } from "@/app/store/date_strore"
 import { CLIENT_DATA_STATUS } from "@/const/const"
+import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 
 type Edit_Modal_Window_Props = {
@@ -11,8 +13,12 @@ type Edit_Modal_Window_Props = {
     id: string
 }
 
+const dataNow = dayjs();
+const month = dataNow.format('MMMM')
+
 export default function Client_Edit_Modal_Window({ time, id, day, show, close }: Edit_Modal_Window_Props) {
-    const { searchViewClient, checkClientData, setClientName, setClientData, clientByDay } = useClientStore()
+    const { searchViewClient, checkClientData, setClientData, clientByDay } = useClientStore()
+    const { numberCurrentWeekInMonth } = useDateStore()
     const [editClientName, setEditClientName] = useState('')
 
     useEffect(() => {
@@ -28,7 +34,7 @@ export default function Client_Edit_Modal_Window({ time, id, day, show, close }:
 
     const submitHandler = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        console.log(id, clientByDay)
+        const dateId = month + numberCurrentWeekInMonth.toString() + 'week'
         if (editClientName === '') {
             setEditClientName('')
             close()
@@ -36,15 +42,11 @@ export default function Client_Edit_Modal_Window({ time, id, day, show, close }:
 
         } else {
             if (checkClientData(id, editClientName, day)) {
-                setClientName({ id: id, name: editClientName })
-                setClientData(id, day, CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } })
-                console.log('update branch')
+                setClientData(day, CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } }, dateId)
                 setEditClientName('')
                 close()
             } else {
-                setClientName({ id: id, name: editClientName })
-                setClientData(id, day, CLIENT_DATA_STATUS.ADD_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } })
-                console.log('submit add branch')
+                setClientData(day, CLIENT_DATA_STATUS.ADD_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } }, dateId)
                 setEditClientName('')
                 close()
             }

@@ -1,32 +1,6 @@
 import { CLIENT_DATA_STATUS, DAYS } from "@/const/const";
 import { create } from "zustand";
-import { TIME_TO_CLIENT } from "@/const/const";
-import { nanoid } from "nanoid";
-import dayjs from "dayjs";
 import { DATA_BASE_ACTIONS, DATA_BASE_ROUTES } from "@/const/baseActions";
-import { ClientDataStatus, User } from "@/const/types";
-import isEqual from 'lodash/isEqual';
-import { time } from "console";
-
-const date = dayjs().format('DD MMMM YYYY');
-
-type ClientNameProps = {
-    id:string,
-    name:string
-}
-
-type UpdateClientProps = {
-  id?:string,
-  day?:string,
-  time?:string,
-  clientName?:string
-}
-
-type SearchCriteria<T> = (item: T) => boolean;
-
-type ClientDataToDB = {
-    status:ClientDataStatus
-}
 
 type ClientDayType = {
     timeToClient:{
@@ -34,17 +8,6 @@ type ClientDayType = {
       time:string,
       name:string
     }
-}
-
-type ClientDayTypeTest = {
-  time:string,
-  name:string
-}
-
-type ClientDaysType = {
-    id:string,
-    day:string,
-    client:ClientDayType[]
 }
 
 type TimeToClient = {
@@ -71,27 +34,19 @@ type DayData = {
 type useClientStoreProps = {
     clientByDay:DocumentData[],
     editOpenStatus:boolean,
-    clientName:ClientNameProps,
-    // clientData:{},
     dbid:string,
-    clientDataStatus:string,
-    clientDataAction:string,
     loadingDB:boolean,
     statusDataFromDB:boolean,
     error:string | null,
     addClientCompleted:boolean,
-    updateClient:boolean,
     getDataDB:() => void,
-    // updateClientByDaysData:(data:UpdateClientProps) => void,
     checkClientData:(name:string, day:string,time:string, update?:boolean) => boolean,
     setEditStatus: (status:boolean) => void,
     searchViewClient: (id:string,day:string,time:string) => string,
-    setClientName: (data:ClientNameProps) => void,
-    setClientDataAction:(status:string) => void,
     searchClient:(criteria: {day:string, id:string, time:string}) => string,
-    setClientData:(id:string,day:string, status:string, data:ClientDayType) => void,
-    // sendDataToDB:(day:string, data:ClientDayType) => void
+    setClientData:( day:string, status:string, data:ClientDayType, id:string) => void,
     setDBid:() => void,
+    setIdDate:(id:string) => void,
     sendDataToDB:(status:string,data:{day:string, clientData:ClientDayType }) => void
 }
 const initialState:DocumentData[] = [
@@ -99,37 +54,37 @@ const initialState:DocumentData[] = [
     _id: '',
     data: [
       {
-        id:date,
+        id:'',
         day: DAYS.MONDAY,
         client: [],
       },
       {
-        id:date,
+        id:'',
         day: DAYS.TUESDAY,
         client: [],
       },
       {
-        id:date,
+        id:'',
         day: DAYS.WEDNESDAY,
         client: [],
       },
       {
-        id:date,
+        id:'',
         day: DAYS.THURSDAY,
         client: [],
       },
       {
-        id:date,
+        id:'',
         day: DAYS.FRIDAY,
         client: [],
       },
       {
-        id:date,
+        id:'',
         day: DAYS.SATURDAY,
         client: [],
       },
       {
-        id:date,
+        id:'',
         day: DAYS.SUNDAYS,
         client: [],
       },
@@ -137,69 +92,39 @@ const initialState:DocumentData[] = [
   }
  
 ]
-// const initialState: ClientDaysType[] = [
-//   {
-//     id:date,
-//     day: DAYS.MONDAY,
-//     client: [],
-//   },
-//   {
-//     id:date,
-//     day: DAYS.TUESDAY,
-//     client: [],
-//   },
-//   {
-//     id:date,
-//     day: DAYS.WEDNESDAY,
-//     client: [],
-//   },
-//   {
-//     id:date,
-//     day: DAYS.THURSDAY,
-//     client: [],
-//   },
-//   {
-//     id:date,
-//     day: DAYS.FRIDAY,
-//     client: [],
-//   },
-//   {
-//     id:date,
-//     day: DAYS.SATURDAY,
-//     client: [],
-//   },
-//   {
-//     id:date,
-//     day: DAYS.SUNDAYS,
-//     client: [],
-//   },
-// ];
+
 
 
 export const useClientStore = create<useClientStoreProps>()(
     (set, get) => ({
         clientByDay:initialState,
         editOpenStatus:false,
-        clientName:{id:'',name:''},
         dbid:'',
         loadingDB:false,
         statusDataFromDB:false,
         addClientCompleted:false,
-        updateClient:false,
-        clientDataStatus:CLIENT_DATA_STATUS.STATIC_CLIENT_DATA,
-        clientDataAction:DATA_BASE_ACTIONS.STATIC_CLIENT_DATA,
         error:'',
         getDataDB: async () => {
           set({ loadingDB: true });
           try {
             const response = await fetch('/api/users');
             const data = await response.json();
-            console.log(data)
             return set({ clientByDay: data, loadingDB: false, statusDataFromDB:true });
           } catch (error) {
             console.error('Error fetching data:', error);
             return set({loadingDB: false, statusDataFromDB:false });
           }
+        },
+        setIdDate:(id) => {
+                set({
+                      clientByDay: get().clientByDay.map((document) => ({
+                        ...document,
+                        data: document.data.map((item) => ({
+                          ...item,
+                          id: id, // Обновляем поле id
+                        })),
+                      })),
+                    });  
         },
         searchClient: (criteria) => {
           
@@ -220,10 +145,6 @@ export const useClientStore = create<useClientStoreProps>()(
         },
         setDBid:() => {
           set({dbid:'111'})
-        },
-
-        setClientDataAction:(status) => {
-          set({clientDataStatus: status})
         },
         searchViewClient: (id, day, time) => {
           let clientNameTemp = ''
@@ -246,17 +167,20 @@ export const useClientStore = create<useClientStoreProps>()(
           );
         },
         setEditStatus: (status) => set({ editOpenStatus: status }),
-        setClientName:(data) => {
-          set({ clientName:{id:data.id,name:data.name}})
-          
-        },
-        setClientData: (id,day,status,data) => {
+        setClientData: (day,status,data,id) => {
           switch(status) {
-            case CLIENT_DATA_STATUS.STATIC_CLIENT_DATA :
-              get().clientByDay.flatMap((document) => document.data.find((element) => 
-                element.day === day 
-                && element.client.find((firstArgument) => firstArgument.timeToClient.time) 
-                 && element.client.find((secondArgument) => secondArgument.timeToClient.name === data.timeToClient.name))) 
+            case CLIENT_DATA_STATUS.STATIC_CLIENT_DATA:
+              if(id) {
+                set({
+                      clientByDay: get().clientByDay.map((document) => ({
+                        ...document,
+                        data: document.data.map((item) => ({
+                          ...item,
+                          id: id, // Обновляем поле id
+                        })),
+                      })),
+                    });
+              }   
               break
             case CLIENT_DATA_STATUS.ADD_CLIENT_DATA:
              set({
@@ -273,6 +197,7 @@ export const useClientStore = create<useClientStoreProps>()(
                           // Создаём новый массив клиентов с добавленным пользователем
                           return {
                             ...item,
+                         
                             client: [
                               ...item.client,
                               {
@@ -290,7 +215,6 @@ export const useClientStore = create<useClientStoreProps>()(
                     }),
                   })),
                 });
-                  set({updateClient:false})
             // get().sendDataToDB(DATA_BASE_ACTIONS.ADD_CLIENT_DATA)
             break
           case CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA:
@@ -403,26 +327,3 @@ export const useClientStore = create<useClientStoreProps>()(
   },
     })
 )
-
-            // try {
-            //       const response = await fetch(DATA_BASE_ROUTES.ADD_CLIENT_DATA_ROUTE, {
-            //           method: 'POST',
-            //           headers: {
-            //               'Content-Type': 'application/json',
-            //           },
-            //           body: JSON.stringify(get().clientByDay),
-            //       });
-
-            //       if (response.ok) {
-            //           const result = await response.json();
-            //           console.log(result.message);
-            //       } else {
-            //           console.error('Ошибка при добавлении клиента');
-            //       }
-            //   } catch (error) {
-            //       console.error('Произошла ошибка при отправке данных:', error);
-            //   } finally {
-            //     set({ loadingDB: false, error: null });
-            //       // сбрасываем состояние отправки
-            //     set({clientDataAction: CLIENT_DATA_STATUS.STATIC_CLIENT_DATA})
-            //   }

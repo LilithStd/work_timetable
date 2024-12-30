@@ -4,6 +4,7 @@ import { useDateStore } from '@/app/store/date_strore';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import Shared_Button from '@/app/shared_components/button/shared_button';
+import { useClientStore } from '@/app/store/client_store';
 
 interface Week {
   Monday: string | number;
@@ -33,7 +34,8 @@ const weekInMonth = currentWeekNumber - weekOfStartOfMonth + 1;
 
 const WeekAndDays = () => {
   // Получаем из стора текущие данные и функции для их обновления
-  const { currentWeek, currentDay, setCurrentWeek, setCurrentDay } = useDateStore();
+  const { currentWeek, currentDay, setCurrentWeek, setCurrentDay, numberCurrentWeekInMonth, setNumberCurrentWeekInMonth } = useDateStore();
+  const { setIdDate, clientByDay } = useClientStore();
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0); // Индекс текущей отображаемой недели
   const [weekInMonth, setWeekInMonth] = useState(1);
 
@@ -60,6 +62,7 @@ const WeekAndDays = () => {
     // Обновляем состояние в сторе
     setCurrentWeek(updatedMonth);
     setCurrentDay(Number(data))
+
   };
   const getCurrentWeekIndex = () => {
     const today = dayjs().date(); // сегодняшнее число
@@ -86,12 +89,22 @@ const WeekAndDays = () => {
       const initialWeekIndex = getCurrentWeekIndex();
       setCurrentWeekIndex(initialWeekIndex);
       setWeekInMonth(initialWeekIndex + 1); // Устанавливаем `weekInMonth` при инициализации
+
     }
   }, [currentWeek]);
 
   useEffect(() => {
+    setNumberCurrentWeekInMonth(weekInMonth)
+    setIdDate(month + numberCurrentWeekInMonth.toString() + 'week')
+
+  }, [numberCurrentWeekInMonth, weekInMonth])
+
+  useEffect(() => {
     updateWeekInMonth(); // Обновляем `weekInMonth` при изменении `currentWeekIndex`
+
   }, [currentWeekIndex]);
+
+  console.log(clientByDay)
 
   // Функции для переключения между неделями
   const goToPreviousWeek = () => {
@@ -107,7 +120,6 @@ const WeekAndDays = () => {
   };
 
   const weekToDisplay = currentWeek[currentWeekIndex];
-
 
   return (
     <div className="grid grid-cols-7 grid-rows-2 col-start-2 col-end-9">
