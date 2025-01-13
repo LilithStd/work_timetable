@@ -1,4 +1,4 @@
-
+'use client'
 import Client from "@/app/components/client/client";
 import Worker from "@/app/components/worker/worker";
 import Board_Cell from "./board_cell/board_cell";
@@ -37,7 +37,7 @@ export default function Board() {
     //         .then((data: User[]) => setUsers(data))
     //         .catch((error) => console.error('Ошибка при получении данных:', error));
     // }, []);
-
+    console.log('update board')
     return (
         <div className="bg-slate-600 grid grid-cols-8 grid-rows-[1fr_0.2fr_1fr_1fr_1fr_1fr] justify-center ">
             <Border_List_Workers />

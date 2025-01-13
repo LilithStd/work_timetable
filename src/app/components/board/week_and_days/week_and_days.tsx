@@ -104,8 +104,6 @@ const WeekAndDays = () => {
 
   }, [currentWeekIndex]);
 
-  console.log(clientByDay)
-
   // Функции для переключения между неделями
   const goToPreviousWeek = () => {
     if (currentWeekIndex > 0) {

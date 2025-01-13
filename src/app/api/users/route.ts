@@ -44,48 +44,132 @@ export async function POST(request: NextRequest) {
 
     // Обработка на основе параметра action
     if (action === DATA_BASE_ACTIONS.ADD_CLIENT_DATA) {
-      const {data} = requestBody;
-      const result = await usersCollection.insertOne({data});
+      const [{_id,data}] = requestBody
+      console.log(_id)
+      const clientDataToDB = {
+        _id:_id,
+        data:data
+      }
+      console.log(clientDataToDB)
+      const result = await usersCollection.insertOne(clientDataToDB);
       return NextResponse.json(
         { message: 'Пользователь добавлен', insertedId: result.insertedId },
         { status: 201 }
       );
     }
     if (action === DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA) {
-      const { day, clientData } = requestBody
-      if (!day || !clientData) {
-      return NextResponse.json(
-        { error: 'Все поля обязательны' },
-        { status: 400 }
-      );
-    }
-            const result = await usersCollection.updateOne( {
-          _id: new ObjectId('67504278651c8d810044ee8f'), // Идентификатор документа
-             // Дата в массиве data
-          'data.day': day, // День недели
-          'data.client.timeToClient.id': clientData.timeToClient.id, // ID клиента
-        },
-        {
-          $set: {
-            'data.$[dateElem].client.$[clientElem].timeToClient.name': clientData.timeToClient.name, // Обновляем имя
-          },
-        },
-        {
-        arrayFilters: [
-          {'dateElem.day': day }, // Фильтр для элемента даты
-          { 'clientElem.timeToClient.id': clientData.timeToClient.id }, // Фильтр для клиента
-        ],
-      }
-      );
-        if (result.matchedCount === 0) {
-          return NextResponse.json({ error: 'День или клиент не найден' }, { status: 404 });
-      }
-      if (result.modifiedCount > 0) {
-          return NextResponse.json({ message: 'Имя клиента успешно обновлено' }, { status: 200 });
-      } else {
-          return NextResponse.json({ message: 'Данные клиента не изменились' }, { status:     304 });
-      }
-    }
+  const { day, clientData } = requestBody;
+
+          if (!day || !clientData) {
+            return NextResponse.json(
+              { error: 'Все поля обязательны' },
+              { status: 400 }
+            );
+          }
+
+          try {
+            // Найти документ, содержащий указанный ID клиента
+            const document = await usersCollection.findOne(
+              { 'data.client.timeToClient.id': clientData.timeToClient.id },
+              { projection: { _id: 1 } } // Проекция для возврата только _id
+            );
+
+            if (!document) {
+              return NextResponse.json(
+                { error: 'Документ с таким клиентом не найден' },
+                { status: 404 }
+              );
+            }
+
+            // Обновить клиента внутри нужного дня
+            const result = await usersCollection.updateOne(
+              {
+                _id: document._id, // Идентификатор документа
+                'data.day': day, // Найти нужный день
+                'data.client.timeToClient.id': clientData.timeToClient.id, // Найти нужного клиента
+              },
+              {
+                $set: {
+                  'data.$[dateElem].client.$[clientElem].timeToClient.name': clientData.timeToClient.name, // Обновить имя клиента
+                },
+              },
+              {
+                arrayFilters: [
+                  { 'dateElem.day': day }, // Фильтр для дня
+                  { 'clientElem.timeToClient.id': clientData.timeToClient.id }, // Фильтр для клиента
+                ],
+              }
+            );
+
+            // Проверка результата обновления
+            if (result.matchedCount === 0) {
+              return NextResponse.json(
+                { error: 'День или клиент не найден' },
+                { status: 404 }
+              );
+            }
+
+            if (result.modifiedCount > 0) {
+              return NextResponse.json(
+                { message: 'Имя клиента успешно обновлено' },
+                { status: 200 }
+              );
+            } else {
+              return NextResponse.json(
+                { message: 'Данные клиента не изменились' },
+                { status: 304 }
+              );
+            }
+          } catch (error) {
+            console.error('Ошибка при обновлении клиента:', error);
+            return NextResponse.json(
+              { error: 'Ошибка на сервере' },
+              { status: 500 }
+            );
+          }
+        }
+    // if (action === DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA) {
+    //   const { day, clientData } = requestBody
+    //   if (!day || !clientData) {
+    //   return NextResponse.json(
+    //     { error: 'Все поля обязательны' },
+    //     { status: 400 }
+    //   );
+    // }
+    //       const document = await usersCollection.findOne({
+    //           'data.client.timeToClient.id': clientData.timeToClient.id
+    //         },
+    //         { projection: { _id: 1 } }
+    //       );
+          
+    //       console.log(document?._id)
+    //         const result = await usersCollection.updateOne( {
+    //       _id: new ObjectId(document?._id), // Идентификатор документа
+    //          // Дата в массиве data
+    //       'data.day': day, // День недели
+    //       'data.client.timeToClient.id': clientData.timeToClient.id, // ID клиента
+    //     },
+    //     {
+    //       $set: {
+    //         'data.$[dateElem].client.$[clientElem].timeToClient.name': clientData.timeToClient.name, // Обновляем имя
+    //       },
+    //     },
+    //     {
+    //     arrayFilters: [
+    //       {'dateElem.day': day }, // Фильтр для элемента даты
+    //       { 'clientElem.timeToClient.id': clientData.timeToClient.id }, // Фильтр для клиента
+    //     ],
+    //   }
+    //   );
+    //     if (result.matchedCount === 0) {
+    //       return NextResponse.json({ error: 'День или клиент не найден' }, { status: 404 });
+    //   }
+    //   if (result.modifiedCount > 0) {
+    //       return NextResponse.json({ message: 'Имя клиента успешно обновлено' }, { status: 200 });
+    //   } else {
+    //       return NextResponse.json({ message: 'Данные клиента не изменились' }, { status:     304 });
+    //   }
+    // }
     if(action === DATA_BASE_ACTIONS.CHECK_CLIENT_DATA) {
         try {
           const { clientData } = requestBody;

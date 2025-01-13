@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bson-objectid": "^2.0.4",
     "dayjs": "^1.11.11",
     "lodash": "^4.17.21",
     "mongodb": "^6.10.0",

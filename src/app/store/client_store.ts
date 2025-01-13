@@ -1,6 +1,7 @@
 import { CLIENT_DATA_STATUS, DAYS } from "@/const/const";
 import { create } from "zustand";
 import { DATA_BASE_ACTIONS, DATA_BASE_ROUTES } from "@/const/baseActions";
+import  ObjectId  from "bson-objectid";
 
 type ClientDayType = {
     timeToClient:{
@@ -47,11 +48,11 @@ type useClientStoreProps = {
     setClientData:( day:string, status:string, data:ClientDayType, id:string) => void,
     setDBid:() => void,
     setIdDate:(id:string) => void,
-    sendDataToDB:(status:string,data:{day:string, clientData:ClientDayType }) => void
+    sendDataToDB:(status:string,data:{day:string, clientData:ClientDayType } | DocumentData[]) => void
 }
 const initialState:DocumentData[] = [
   {
-    _id: '',
+    _id: new ObjectId().toString(),
     data: [
       {
         id:'',
@@ -215,7 +216,7 @@ export const useClientStore = create<useClientStoreProps>()(
                     }),
                   })),
                 });
-            // get().sendDataToDB(DATA_BASE_ACTIONS.ADD_CLIENT_DATA)
+            get().sendDataToDB(DATA_BASE_ACTIONS.ADD_CLIENT_DATA,get().clientByDay )
             break
           case CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA:
             console.log('update path')
@@ -244,7 +245,7 @@ export const useClientStore = create<useClientStoreProps>()(
                   }),
                 })),
               });
-            // get().sendDataToDB(DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA, {day:day,clientData:data})
+            get().sendDataToDB(DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA, {day:day,clientData:data})
             break
             case CLIENT_DATA_STATUS.CHECK_CLIENT_DATA: 
               get().sendDataToDB(DATA_BASE_ACTIONS.CHECK_CLIENT_DATA, {day:day, clientData:data})
@@ -256,12 +257,14 @@ export const useClientStore = create<useClientStoreProps>()(
             switch(status) {
               case DATA_BASE_ACTIONS.ADD_CLIENT_DATA:
                 try {
+                  console.log(data)
                   const response = await fetch(DATA_BASE_ROUTES.ADD_CLIENT_DATA_ROUTE, {
                       method: 'POST',
                       headers: {
                           'Content-Type': 'application/json',
                       },
-                      body: JSON.stringify(get().clientByDay),
+                      body: JSON.stringify(data),
+                      // body: JSON.stringify(get().clientByDay),
                   });
 
                   if (response.ok) {
