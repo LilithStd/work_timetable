@@ -11,6 +11,7 @@ import { DAYS_WEEK, TIME_TO_CLIENT } from "@/const/const";
 import WeekAndDays from "./week_and_days/week_and_days";
 import { useClientStore } from "@/app/store/client_store";
 import { User } from "@/const/types";
+import { useWorkerStore } from "@/app/store/workers_store";
 
 const dataNow = dayjs()
 const month = dataNow.format('MMMM')
@@ -24,11 +25,8 @@ const days_week_cell = new Array(4).fill(null)
 
 
 export default function Board() {
-    // const { clientByDay, loadingDB, getDataDB } = useClientStore()
-    // useEffect(() => {
-    //     // getDataDB()
-    //     console.log(clientByDay)
-    // }, [getDataDB])
+    const getDataDB = useClientStore(state => state.getDataDB)
+    const clientArray = useClientStore(state => state.clientByDay)
     // const [users, setUsers] = useState<User[]>([]);
 
     // useEffect(() => {
@@ -37,7 +35,12 @@ export default function Board() {
     //         .then((data: User[]) => setUsers(data))
     //         .catch((error) => console.error('Ошибка при получении данных:', error));
     // }, []);
-    console.log('update board')
+
+    useEffect(() => {
+        getDataDB()
+    }, [])
+
+    console.log('update board', clientArray)
     return (
         <div className="bg-slate-600 grid grid-cols-8 grid-rows-[1fr_0.2fr_1fr_1fr_1fr_1fr] justify-center ">
             <Border_List_Workers />

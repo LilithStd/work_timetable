@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import Client_Edit_Modal_Window from "./components/client_edit_modal_window"
 import { useClientStore } from "@/app/store/client_store"
 import { useDateStore } from "@/app/store/date_strore"
+import { useGlobalStore } from "@/app/store/global_store"
 
 type Client_Props = {
     id: string,
@@ -14,7 +15,9 @@ type Client_Props = {
 
 export default function Client({ id, time, day, name, template }: Client_Props) {
     const currentId = id
-    const { editOpenStatus, setEditStatus, searchClient, clientByDay } = useClientStore()
+    const { searchClient, clientByDay } = useClientStore()
+    const clientEditOpenStatus = useGlobalStore(state => state.clientEditOpenStatus)
+    const setClientEditStatus = useGlobalStore(state => state.setClientEditStatus)
     const { numberCurrentWeekInMonth } = useDateStore()
     const [clientNameComponent, setClientNameComponent] = useState('')
     const [showModal, setShowModal] = useState(false)
@@ -32,17 +35,17 @@ export default function Client({ id, time, day, name, template }: Client_Props) 
     )
 
     const editOpenHandler = () => {
-        if (editOpenStatus) {
+        if (clientEditOpenStatus) {
             return
         } else {
-            setEditStatus(true)
+            setClientEditStatus(true)
             setShowModal(true)
         }
     }
     const editCloseHandler = () => {
         setClientNameComponent(searchClient({ day: day, id: currentId, time: time }))
         setShowModal(false);
-        setEditStatus(false);
+        setClientEditStatus(false);
 
     }
 
@@ -53,7 +56,7 @@ export default function Client({ id, time, day, name, template }: Client_Props) 
             <>
                 <button
                     onClick={editOpenHandler}
-                    disabled={editOpenStatus}
+                    disabled={clientEditOpenStatus}
                 >
                     <span>
                         {clientNameComponent}

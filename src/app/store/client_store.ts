@@ -34,7 +34,7 @@ type DayData = {
 
 type useClientStoreProps = {
     clientByDay:DocumentData[],
-    editOpenStatus:boolean,
+    // editOpenStatus:boolean,
     dbid:string,
     loadingDB:boolean,
     statusDataFromDB:boolean,
@@ -42,7 +42,7 @@ type useClientStoreProps = {
     addClientCompleted:boolean,
     getDataDB:() => void,
     checkClientData:(name:string, day:string,time:string, update?:boolean) => boolean,
-    setEditStatus: (status:boolean) => void,
+    // setEditStatus: (status:boolean) => void,
     searchViewClient: (id:string,day:string,time:string) => string,
     searchClient:(criteria: {day:string, id:string, time:string}) => string,
     setClientData:( day:string, status:string, data:ClientDayType, id:string) => void,
@@ -99,7 +99,7 @@ const initialState:DocumentData[] = [
 export const useClientStore = create<useClientStoreProps>()(
     (set, get) => ({
         clientByDay:initialState,
-        editOpenStatus:false,
+        // editOpenStatus:false,
         dbid:'',
         loadingDB:false,
         statusDataFromDB:false,
@@ -138,8 +138,11 @@ export const useClientStore = create<useClientStoreProps>()(
                 .flatMap((dayRecord) =>
                   dayRecord.client // Перебираем массив клиентов текущего дня
                     // .filter((client) => client.timeToClient.time === criteria.time)
-                    .filter((client) => client.timeToClient.id === criteria.id) // Фильтруем по `id`
-                    .map((client) => client.timeToClient.name || "EDIT") // Возвращаем имя или "EDIT"
+                    .filter((client) => client.timeToClient.time === criteria.time)
+                     // Фильтруем по `id`
+                    .map((client) => (                     
+                      client.timeToClient.name || "EDIT")
+                    ) // Возвращаем имя или "EDIT"
                 )
             );
             return resultSearch.length > 0 ? resultSearch[0] : 'EDIT'; // Возвращаем первый результат или "EDIT"  
@@ -167,7 +170,8 @@ export const useClientStore = create<useClientStoreProps>()(
             )
           );
         },
-        setEditStatus: (status) => set({ editOpenStatus: status }),
+        // setEditStatus: (status) => set({ editOpenStatus: status })
+        // ,
         setClientData: (day,status,data,id) => {
           switch(status) {
             case CLIENT_DATA_STATUS.STATIC_CLIENT_DATA:
@@ -257,7 +261,6 @@ export const useClientStore = create<useClientStoreProps>()(
             switch(status) {
               case DATA_BASE_ACTIONS.ADD_CLIENT_DATA:
                 try {
-                  console.log(data)
                   const response = await fetch(DATA_BASE_ROUTES.ADD_CLIENT_DATA_ROUTE, {
                       method: 'POST',
                       headers: {
