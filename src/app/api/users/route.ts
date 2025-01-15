@@ -58,9 +58,8 @@ export async function POST(request: NextRequest) {
       );
     }
     if (action === DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA) {
-  const { day, clientData } = requestBody;
-
-          if (!day || !clientData) {
+      const { day, clientData, _id } = requestBody;
+          if (!day || !clientData || !_id) {
             return NextResponse.json(
               { error: 'Все поля обязательны' },
               { status: 400 }
@@ -84,7 +83,8 @@ export async function POST(request: NextRequest) {
             // Обновить клиента внутри нужного дня
             const result = await usersCollection.updateOne(
               {
-                _id: document._id, // Идентификатор документа
+                _id: _id, // Идентификатор документа
+                //  _id: document._id, // Идентификатор документа
                 'data.day': day, // Найти нужный день
                 'data.client.timeToClient.id': clientData.timeToClient.id, // Найти нужного клиента
               },

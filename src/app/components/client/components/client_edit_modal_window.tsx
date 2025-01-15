@@ -25,6 +25,7 @@ export default function Client_Edit_Modal_Window({ time, id, day, show, close }:
         if (searchViewClient(id, day, time)) {
             setEditClientName(searchViewClient(id, day, time));
         }
+
     }, [day, id, searchViewClient, time]);
 
 
@@ -41,11 +42,13 @@ export default function Client_Edit_Modal_Window({ time, id, day, show, close }:
             console.log('submit if string = 0')
 
         } else {
-            if (checkClientData(id, editClientName, day)) {
+            if (checkClientData(id, editClientName, day) && editClientName !== 'EDIT') {
+                console.log(checkClientData(id, editClientName, day) || editClientName !== 'EDIT')
                 setClientData(day, CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } }, dateId)
                 setEditClientName('')
                 close()
             } else {
+                console.log('add branch')
                 setClientData(day, CLIENT_DATA_STATUS.ADD_CLIENT_DATA, { timeToClient: { id: id, time: time, name: editClientName } }, dateId)
                 setEditClientName('')
                 close()

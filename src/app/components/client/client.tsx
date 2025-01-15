@@ -28,7 +28,6 @@ export default function Client({ id, time, day, name, template }: Client_Props) 
             day: day, id: currentId, time: time
         }
         const tempResult = searchClient(object)
-
         setClientNameComponent(tempResult)
 
     }, [currentId, day, searchClient, time]
@@ -48,8 +47,6 @@ export default function Client({ id, time, day, name, template }: Client_Props) 
         setClientEditStatus(false);
 
     }
-
-    // console.log(clientByDay)
 
     return (
         <div className={`rounded opacity-100`}>

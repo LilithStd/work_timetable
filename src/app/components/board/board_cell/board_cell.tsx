@@ -15,7 +15,7 @@ type Board_Cell = {
 
 export default function Board_Cell({ id, time, day, worker, client }: Board_Cell) {
     const CLIENTS = new Array(3).fill(null).map(() =>
-        <Client id={nanoid()} key={nanoid()} day={day} time={time} />
+        <Client id={nanoid()} key={nanoid()} day={day} time={time} name={''} />
     );
     const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(null).map(() =>
         <Worker id={nanoid()} key={nanoid()} day={day} />)

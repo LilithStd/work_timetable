@@ -35,7 +35,6 @@ type DayData = {
 type useClientStoreProps = {
     clientByDay:DocumentData[],
     // editOpenStatus:boolean,
-    dbid:string,
     loadingDB:boolean,
     statusDataFromDB:boolean,
     error:string | null,
@@ -46,9 +45,8 @@ type useClientStoreProps = {
     searchViewClient: (id:string,day:string,time:string) => string,
     searchClient:(criteria: {day:string, id:string, time:string}) => string,
     setClientData:( day:string, status:string, data:ClientDayType, id:string) => void,
-    setDBid:() => void,
     setIdDate:(id:string) => void,
-    sendDataToDB:(status:string,data:{day:string, clientData:ClientDayType } | DocumentData[]) => void
+    sendDataToDB:(status:string,data:{day:string, clientData:ClientDayType, _id?:string } | DocumentData[]) => void
 }
 const initialState:DocumentData[] = [
   {
@@ -100,7 +98,6 @@ export const useClientStore = create<useClientStoreProps>()(
     (set, get) => ({
         clientByDay:initialState,
         // editOpenStatus:false,
-        dbid:'',
         loadingDB:false,
         statusDataFromDB:false,
         addClientCompleted:false,
@@ -110,7 +107,11 @@ export const useClientStore = create<useClientStoreProps>()(
           try {
             const response = await fetch('/api/users');
             const data = await response.json();
-            return set({ clientByDay: data, loadingDB: false, statusDataFromDB:true });
+            if(data.length === 0) {
+              return
+            }else{
+              return set({ clientByDay: data, loadingDB: false, statusDataFromDB:true });
+            }
           } catch (error) {
             console.error('Error fetching data:', error);
             return set({loadingDB: false, statusDataFromDB:false });
@@ -138,17 +139,15 @@ export const useClientStore = create<useClientStoreProps>()(
                 .flatMap((dayRecord) =>
                   dayRecord.client // Перебираем массив клиентов текущего дня
                     // .filter((client) => client.timeToClient.time === criteria.time)
-                    .filter((client) => client.timeToClient.time === criteria.time)
+                    .filter((client) => client.timeToClient.id === criteria.id)
                      // Фильтруем по `id`
-                    .map((client) => (                     
+                    .map((client) => 
                       client.timeToClient.name || "EDIT")
-                    ) // Возвращаем имя или "EDIT"
+                    // Возвращаем имя или "EDIT"
                 )
             );
+            // return resultSearch; 
             return resultSearch.length > 0 ? resultSearch[0] : 'EDIT'; // Возвращаем первый результат или "EDIT"  
-        },
-        setDBid:() => {
-          set({dbid:'111'})
         },
         searchViewClient: (id, day, time) => {
           let clientNameTemp = ''
@@ -249,7 +248,8 @@ export const useClientStore = create<useClientStoreProps>()(
                   }),
                 })),
               });
-            get().sendDataToDB(DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA, {day:day,clientData:data})
+            const ids = get().clientByDay.map(item => item._id);
+            get().sendDataToDB(DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA, {day:day,clientData:data, _id:ids[0]})
             break
             case CLIENT_DATA_STATUS.CHECK_CLIENT_DATA: 
               get().sendDataToDB(DATA_BASE_ACTIONS.CHECK_CLIENT_DATA, {day:day, clientData:data})
