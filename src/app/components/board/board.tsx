@@ -40,7 +40,6 @@ export default function Board() {
         getDataDB()
     }, [])
 
-    console.log('update board', clientArray)
     return (
         <div className="bg-slate-600 grid grid-cols-8 grid-rows-[1fr_0.2fr_1fr_1fr_1fr_1fr] justify-center ">
             <Border_List_Workers />

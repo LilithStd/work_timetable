@@ -9,18 +9,7 @@ type Client_Board = {
 }
 
 export default function Clients_board({ clients }: Client_Board) {
-  // const { clientByDay, loadingDB, getDataDB } = useClientStore()
-  // useEffect(() => {
-  //   getDataDB()
-  // }, [])
-  useEffect(() => {
-    fetch('/api/users')
-      .then((response) => response.json())
-      .then((data: User[]) => setUsers(data))
-      .catch((error) => console.error('Ошибка при получении данных:', error));
-  }, []);
-
-  const [users, setUsers] = useState<User[]>([]);
+  const clientD = useClientStore(state => state.searchClientData)
   const clientData = clients ? clients : []
   return (
     clientData.map((item) =>
