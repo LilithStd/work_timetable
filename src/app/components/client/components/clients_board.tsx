@@ -9,8 +9,9 @@ type Client_Board = {
 }
 
 export default function Clients_board({ clients }: Client_Board) {
-  const clientD = useClientStore(state => state.searchClientData)
+
   const clientData = clients ? clients : []
+  // console.log(clients)
   return (
     clientData.map((item) =>
       <div

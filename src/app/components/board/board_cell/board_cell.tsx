@@ -4,6 +4,7 @@ import { COUNT_WORKERS_PER_DAY, COUNT_WORKERS_PER_DAYS } from "@/const/const"
 import { nanoid } from "nanoid"
 import Clients_board from "../../client/components/clients_board"
 import { useClientStore } from "@/app/store/client_store"
+import { Key } from "react"
 
 
 type Board_Cell = {
@@ -15,15 +16,15 @@ type Board_Cell = {
 }
 
 export default function Board_Cell({ id, time, day, worker, client }: Board_Cell) {
-
-
-    const CLIENTS = new Array(3).fill(null).map(() =>
-        <Client id={nanoid()} key={nanoid()} day={day} time={time} name={''} />
+    const clientD = useClientStore(state => state.searchClientData)
+    const CLIENTS = new Array(3).fill(null).map((item) =>
+        <Client id={nanoid()} key={nanoid()} day={day} time={time} name={item} />
     );
+
+    console.log(clientD(day, time).flatMap((item) => item.client.some((element) => element.timeToClient.name === '123')))
     const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(null).map(() =>
         <Worker id={nanoid()} key={nanoid()} day={day} />)
     const WORKERS = new Array(COUNT_WORKERS_PER_DAYS).fill(WORKER)
-
 
     return (
         <div className="grid grid-cols-2 grid-rows-3">
