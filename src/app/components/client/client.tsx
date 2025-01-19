@@ -22,15 +22,20 @@ export default function Client({ id, time, day, name, template }: Client_Props) 
     const [clientNameComponent, setClientNameComponent] = useState('')
     const [showModal, setShowModal] = useState(false)
 
-
     useEffect(() => {
-        const object = {
-            day: day, id: currentId, time: time
+        if (name) {
+            setClientNameComponent(name)
+        } else {
+            console.log('else branch')
+            const object = {
+                day: day, id: currentId, time: time
+            }
+            const tempResult = searchClient(object)
+            setClientNameComponent(tempResult)
         }
-        const tempResult = searchClient(object)
-        setClientNameComponent(tempResult)
 
-    }, [currentId, day, searchClient, time]
+
+    }, [currentId, day, searchClient, time, name]
     )
 
     const editOpenHandler = () => {

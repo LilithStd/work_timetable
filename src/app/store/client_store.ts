@@ -40,7 +40,7 @@ type useClientStoreProps = {
 	error: string | null;
 	addClientCompleted: boolean;
 	getDataDB: () => void;
-	searchClientData: (day: string, time: string) => DayData[];
+	searchClientData: (day: string, time: string) => Client[];
 	checkClientData: (
 		name: string,
 		day: string,
@@ -147,9 +147,12 @@ export const useClientStore = create<useClientStoreProps>()((set, get) => ({
 	searchClientData: (day, time) => {
 		return get().clientByDay.flatMap((item) =>
 			item.data
-				.filter((element) => element.day === day)
-				.filter((clients) =>
-					clients.client.flatMap((item) => item.timeToClient.time === time),
+				.filter((element) => element.day === day) // Фильтруем по `day`
+				.flatMap(
+					(clients) =>
+						clients.client.filter(
+							(client) => client.timeToClient.time === time,
+						), // Фильтруем по `time`
 				),
 		);
 	},
