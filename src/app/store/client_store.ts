@@ -155,7 +155,22 @@ export const useClientStore = create<useClientStoreProps>()((set, get) => ({
 	},
 	searchClient: (criteria) => {
 		const clientByDay: DocumentData[] = get().clientByDay; // Получаем данные из состояния
-
+		const clientByTime = clientByDay.flatMap((document) => document.data);
+		const hasUniqueId = (array: DayData[]) => {
+			return array.some((document) =>
+				document.client.some((item) => {
+					const currentId = item.timeToClient.id;
+					return (
+						array.filter(
+							(document) =>
+								document.client.filter(
+									(otherItem) => otherItem.timeToClient.id === currentId,
+								).length === 1,
+						).length === 1
+					);
+				}),
+			);
+		};
 		const resultSearch = clientByDay.flatMap((document) =>
 			document.data // Перебираем массив `data` внутри каждого документа
 				.filter((dayRecord) => dayRecord.day === criteria.day) // Ищем нужный день
@@ -163,7 +178,11 @@ export const useClientStore = create<useClientStoreProps>()((set, get) => ({
 					(dayRecord) =>
 						dayRecord.client // Перебираем массив клиентов текущего дня
 							// .filter((client) => client.timeToClient.time === criteria.time)
-							.filter((client) => client.timeToClient.id === criteria.id)
+							.filter(
+								(client) =>
+									client.timeToClient.time === criteria.time &&
+									hasUniqueId(document.data),
+							)
 							// Фильтруем по `id`
 							.map((client) => client.timeToClient.name || 'EDIT'),
 					// Возвращаем имя или "EDIT"

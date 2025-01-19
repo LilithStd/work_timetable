@@ -11,7 +11,6 @@ type Client_Board = {
 export default function Clients_board({ clients }: Client_Board) {
 
   const clientData = clients ? clients : []
-  // console.log(clients)
   return (
     clientData.map((item) =>
       <div

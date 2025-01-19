@@ -17,11 +17,14 @@ type Board_Cell = {
 
 export default function Board_Cell({ id, time, day, worker, client }: Board_Cell) {
     const clientD = useClientStore(state => state.searchClientData)
-    const CLIENTS = new Array(3).fill(null).map((item) =>
-        <Client id={nanoid()} key={nanoid()} day={day} time={time} name={item} />
-    );
+    const temp = clientD(day, time).filter((item) => item.client.flatMap((element) => element.timeToClient.name !== '' ? element.timeToClient.name : ''))
 
-    console.log(clientD(day, time).flatMap((item) => item.client.some((element) => element.timeToClient.name === '123')))
+    const CLIENTS2 = temp
+    const CLIENTS = new Array(3).fill(null).map(() =>
+
+        <Client id={nanoid()} key={nanoid()} day={day} time={time} name={''} />
+    )
+
     const WORKER = new Array(COUNT_WORKERS_PER_DAY).fill(null).map(() =>
         <Worker id={nanoid()} key={nanoid()} day={day} />)
     const WORKERS = new Array(COUNT_WORKERS_PER_DAYS).fill(WORKER)
