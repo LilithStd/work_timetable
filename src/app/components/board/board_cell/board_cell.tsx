@@ -30,12 +30,12 @@ export default function Board_Cell({ id, time, day, worker, client }: Board_Cell
     const createClients = () => {
         const MAX_CLIENTS = 3;
         const filledArray = [...temp, ...Array(Math.max(0, MAX_CLIENTS - temp.length)).fill(placeholder)];
-        const clientArray = filledArray.map((item, index) => (
+        const clientArray = filledArray.map((item) => (
             <Client
                 id={item.timeToClient.id}
-                key={item.timeToClient.id || nanoid()} // Уникальный ключ
+                key={item.timeToClient.id ? item.timeToClient.id : nanoid()} // Уникальный ключ
                 day={day}
-                time={item.timeToClient.time || "00:00"} // Значение по умолчанию
+                time={time} // Значение по умолчанию
                 name={item.timeToClient.name}
             />
         ));

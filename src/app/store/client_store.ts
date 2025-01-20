@@ -59,9 +59,7 @@ type useClientStoreProps = {
 	setIdDate: (id: string) => void;
 	sendDataToDB: (
 		status: string,
-		data:
-			| {day: string; clientData: ClientDayType; _id?: string}
-			| DocumentData[],
+		data: {day: string; clientData: ClientDayType; _id?: string},
 	) => void;
 };
 const initialState: DocumentData[] = [
@@ -224,6 +222,7 @@ export const useClientStore = create<useClientStoreProps>()((set, get) => ({
 	// setEditStatus: (status) => set({ editOpenStatus: status })
 	// ,
 	setClientData: (day, status, data, id) => {
+		const ids = get().clientByDay.map((item) => item._id);
 		switch (status) {
 			case CLIENT_DATA_STATUS.STATIC_CLIENT_DATA:
 				if (id) {
@@ -240,41 +239,37 @@ export const useClientStore = create<useClientStoreProps>()((set, get) => ({
 				break;
 			case CLIENT_DATA_STATUS.ADD_CLIENT_DATA:
 				set({
-					clientByDay: get().clientByDay.map((document) => ({
-						...document,
-						data: document.data.map((item) => {
-							if (item.day === day) {
-								// Проверяем, существует ли клиент с указанным временем
-								const clientExists = item.client.some(
-									(element) => element.timeToClient.id === data.timeToClient.id,
-								);
+					clientByDay: get().clientByDay.map((item) => {
+						return {
+							...item,
+							data: item.data.map((element) => {
+								if (element.day === day) {
+									// Проверяем, есть ли клиент с таким же id и time
+									const clientExists = element.client.some(
+										(client) =>
+											client.timeToClient.id === data.timeToClient.id &&
+											client.timeToClient.time === data.timeToClient.time,
+									);
 
-								if (!clientExists) {
-									// Создаём новый массив клиентов с добавленным пользователем
-									return {
-										...item,
-
-										client: [
-											...item.client,
-											{
-												timeToClient: {
-													id: data.timeToClient.id,
-													time: data.timeToClient.time,
-													name: data.timeToClient.name,
-												},
-											},
-										],
-									};
+									if (!clientExists) {
+										// Добавляем нового клиента, если его еще нет
+										return {
+											...element,
+											client: [...element.client, data],
+										};
+									}
 								}
-							}
-							return item; // Возвращаем элемент без изменений, если условие не выполнено
-						}),
-					})),
+
+								return element;
+							}),
+						};
+					}),
 				});
-				get().sendDataToDB(
-					DATA_BASE_ACTIONS.ADD_CLIENT_DATA,
-					get().clientByDay,
-				);
+				get().sendDataToDB(DATA_BASE_ACTIONS.ADD_CLIENT_DATA, {
+					day: day,
+					clientData: data,
+					_id: ids[0],
+				});
 				break;
 			case CLIENT_DATA_STATUS.UPDATE_CLIENT_DATA:
 				console.log('update path');
@@ -303,7 +298,7 @@ export const useClientStore = create<useClientStoreProps>()((set, get) => ({
 						}),
 					})),
 				});
-				const ids = get().clientByDay.map((item) => item._id);
+
 				get().sendDataToDB(DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA, {
 					day: day,
 					clientData: data,

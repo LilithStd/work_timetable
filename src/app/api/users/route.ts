@@ -44,17 +44,74 @@ export async function POST(request: NextRequest) {
 	try {
 		// Обработка на основе параметра action
 		if (action === DATA_BASE_ACTIONS.ADD_CLIENT_DATA) {
-			const [{_id, data}] = requestBody;
-			const clientDataToDB = {
-				_id: _id,
-				data: data,
-			};
+			const {_id, day, clientData} = requestBody;
+			console.log(clientData);
+			try {
+				// Проверка входных данных
+				if (!day || !clientData || !_id) {
+					console.log('none data item');
+					return NextResponse.json(
+						{error: 'Все поля обязательны'},
+						{status: 400},
+					);
+				}
 
-			const result = await usersCollection.insertOne(clientDataToDB);
-			return NextResponse.json(
-				{message: 'Пользователь добавлен', insertedId: result.insertedId},
-				{status: 201},
-			);
+				// Обновление данных в MongoDB
+				const result = await usersCollection.updateOne(
+					{
+						_id: _id, // Уникальный идентификатор документа
+						'data.day': day, // Найти нужный день
+						'data.client': {
+							$not: {
+								$elemMatch: {
+									'timeToClient.id': clientData.timeToClient.id,
+									'timeToClient.time': clientData.timeToClient.time,
+								},
+							},
+						},
+					},
+					{
+						$push: {
+							'data.$.client': clientData, // Добавить нового клиента
+						},
+					},
+				);
+
+				// Обработка результата
+				if (result.matchedCount === 0) {
+					return NextResponse.json(
+						{
+							success: false,
+							message:
+								'День не найден или клиент с таким ID и временем уже существует.',
+						},
+						{status: 404},
+					);
+				}
+
+				if (result.modifiedCount > 0) {
+					return NextResponse.json(
+						{success: true, message: 'Клиент успешно добавлен.'},
+						{status: 200},
+					);
+				} else {
+					return NextResponse.json(
+						{success: false, message: 'Клиент не добавлен.'},
+						{status: 304},
+					);
+				}
+			} catch (error) {
+				console.error('Ошибка при добавлении клиента:', error);
+				return NextResponse.json(
+					{success: false, message: 'Ошибка на сервере.'},
+					{status: 500},
+				);
+			}
+			// const result = await usersCollection.insertOne(clientDataToDB);
+			// return NextResponse.json(
+			// 	{message: 'Пользователь добавлен', insertedId: result.insertedId},
+			// 	{status: 201},
+			// );
 		}
 		if (action === DATA_BASE_ACTIONS.UPDATE_CLIENT_DATA) {
 			const {day, clientData, _id} = requestBody;
